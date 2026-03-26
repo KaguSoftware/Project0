@@ -1,57 +1,39 @@
-// 1. Fetching (Make sure to include ?populate=* to get the image!)
-async function getProducts() {
-	const res = await fetch("http://localhost:1337/api/products?populate=*", {
-		cache: "no-store",
-	});
-	const response = await res.json();
-	return response.data;
-}
-
-export default async function Home() {
-	const products = await getProducts();
-
+export default function Home() {
 	return (
-		<main className="p-10 bg-slate-50 min-h-screen">
-			<h1 className="text-3xl font-bold mb-8">Ferel Moda Test</h1>
+		<main className="flex min-h-screen flex-col items-center justify-center p-24 bg-slate-50 text-slate-900">
+			<div className="max-w-2xl w-full text-center space-y-6">
+				<h1 className="text-5xl font-extrabold tracking-tight">
+					Next.js is ready.
+				</h1>
 
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-				{products?.map((product: any) => {
-					// Strapi 5 Image Logic
-					const imageUrl = product.Image
-						? `http://localhost:1337${product.Image.url}`
-						: "https://via.placeholder.com/300";
+				<p className="text-lg text-slate-600">
+					The backend is currently disconnected, so we are showing
+					this static placeholder instead of your product list.
+				</p>
 
-					return (
-						<div
-							key={product.id}
-							className="bg-white p-4 shadow-sm rounded-xl border"
-						>
-							{/* The Image */}
-							<div className="relative w-full h-64 mb-4 overflow-hidden rounded-lg">
-								<img
-									src={imageUrl}
-									alt={product.title}
-									className="object-cover w-full h-full"
-								/>
-							</div>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
+					<div className="p-6 text-left bg-white border border-slate-200 rounded-xl shadow-sm">
+						<h2 className="font-bold text-lg mb-2">Frontend</h2>
+						<p className="text-sm text-slate-500">
+							The Next.js dev server is running with Turbopack.
+							You can edit this file in{" "}
+							<code className="bg-slate-100 px-1 rounded">
+								src/app/[locale]/page.tsx
+							</code>
+							.
+						</p>
+					</div>
 
-							{/* The Text - Matching your exact screenshot names */}
-							<h2 className="text-xl font-semibold capitalize">
-								{product.title}
-							</h2>
-							<p className="text-blue-600 font-bold mt-2">
-								${product.Price}
-							</p>
-
-							{/* Optional: Show status based on your 'Display' boolean */}
-							{product.Display && (
-								<span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded mt-2 inline-block">
-									Live on Store
-								</span>
-							)}
-						</div>
-					);
-				})}
+					<div className="p-6 text-left bg-white border border-slate-200 rounded-xl shadow-sm">
+						<h2 className="font-bold text-lg mb-2">
+							Backend Status
+						</h2>
+						<p className="text-sm text-slate-500 italic">
+							Offline. Switch back to your fetch logic once your
+							Strapi server is running on port 1337.
+						</p>
+					</div>
+				</div>
 			</div>
 		</main>
 	);
