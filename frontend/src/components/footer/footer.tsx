@@ -10,13 +10,13 @@ export const Footer = () => {
     return (
         <footer className="w-full bg-white text-black border-t border-gray-800">
             <MaxWidthWrapper>
-                <div className="grid grid-cols-1 md:grid-cols-3 pt-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 p-8">
                     {FOOTER_DATA.map((section, idx) => (
                         <div key={idx}>
                             <h3 className="font-bold text-2xl pb-5">
                                 {t(section.titleKey)}
                             </h3>
-                            <ul className="flex flex-col">
+                            <ul className="flex flex-col gap-2">
                                 {section.links.map((link, linkIdx) => (
                                     <li key={linkIdx}>
                                         <Link

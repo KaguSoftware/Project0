@@ -31,7 +31,6 @@ export const FOOTER_DATA: footerTypes = [
             { label: "footer.third.two", href: "/second" },
             { label: "footer.third.three", href: "/thvird" },
             { label: "footer.third.four", href: "/thifrd" },
-            { label: "footer.third.five", href: "/thfird" },
         ],
     }
 ];
