@@ -83,15 +83,15 @@ export default function Navbar() {
     return (
         // 1. Outer Shell: Handles Position, Background, Blur, and Border only.
         // Removed 'px-6' and flex utilities from here.
-        <nav className="sticky top-0 z-999 border-b border-neutral-100 bg-white/80 py-4 shadow-sm backdrop-blur-md">
+        <nav className="sticky top-0 z-999 border-b border-neutral-100 bg-white/80 shadow-sm backdrop-blur-md">
             {/* 2. MaxWidthWrapper: Handles the width constraints and alignment */}
             <MaxWidthWrapper className="flex items-center justify-between">
                 {/* LOGO */}
                 <Link href="/">
                     <Image
-                        src="/IMG_3966.jpg"
-                        width={80}
-                        height={44}
+                        src="/LogoNoBg.png"
+                        width={100}
+                        height={40}
                         alt="logo gang"
                     />
                 </Link>
@@ -108,7 +108,7 @@ export default function Navbar() {
                             onMouseEnter={() => setHoveredIndex(index)}
                             className={`relative z-0 px-2 py-1 text-xs font-bold uppercase tracking-widest transition-colors ${
                                 hoveredIndex === index
-                                    ? "text-logocolor"
+                                    ? "text-white"
                                     : "text-neutral-500"
                             }`}
                         >
@@ -131,7 +131,7 @@ export default function Navbar() {
                         // href={pathname}
                         href={"/"}
                         // locale={locale === "en" ? "ar" : "en"}
-                        className="text-sm font-bold uppercase tracking-widest text-neutral-500 hover:text-logocolor flex items-center gap-1"
+                        className="text-sm font-bold uppercase tracking-widest text-neutral-500 hover:text-white flex items-center gap-1"
                     >
                         <Globe aria-label="language change" size={16} />
                         {/* {locale === "en" ? "AR" : "EN"} */}
