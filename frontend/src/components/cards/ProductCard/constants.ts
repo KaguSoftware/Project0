@@ -6,7 +6,55 @@ export const PRODUCTS: Product[] = [
         title: "Vamos Korean Style Pants",
         originalPrice: "₺1.599,99",
         currentPrice: "₺1.399,99",
-        imageUrl: "/mock-images/mockpants.png"
-    }
-
+        imageUrl: "/mockupCategory.png",
+    },
+    {
+        id: 2,
+        title: "Vamos Korean Style Pants",
+        originalPrice: "₺1.599,99",
+        currentPrice: "₺1.399,99",
+        imageUrl: "/mockupCategory.png",
+    },
+    {
+        id: 3,
+        title: "Vamos Korean Style Pants",
+        originalPrice: "₺1.599,99",
+        currentPrice: "₺1.399,99",
+        imageUrl: "/mockupCategory.png",
+    },
+    {
+        id: 4,
+        title: "Vamos Korean Style Pants",
+        originalPrice: "₺1.599,99",
+        currentPrice: "₺1.399,99",
+        imageUrl: "/mockupCategory.png",
+    },
+    {
+        id: 5,
+        title: "Vamos Korean Style Pants",
+        originalPrice: "₺1.599,99",
+        currentPrice: "₺1.399,99",
+        imageUrl: "/mockupCategory.png",
+    },
+    {
+        id: 6,
+        title: "Vamos Korean Style Pants",
+        originalPrice: "₺1.599,99",
+        currentPrice: "₺1.399,99",
+        imageUrl: "/mockupCategory.png",
+    },
+    {
+        id: 7,
+        title: "Vamos Korean Style Pants",
+        originalPrice: "₺1.599,99",
+        currentPrice: "₺1.399,99",
+        imageUrl: "/mockupCategory.png",
+    },
+    {
+        id: 8,
+        title: "Vamos Korean Style Pants",
+        originalPrice: "₺1.599,99",
+        currentPrice: "₺1.399,99",
+        imageUrl: "/mockupCategory.png",
+    },
 ];
