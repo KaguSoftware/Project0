@@ -1,0 +1,8 @@
+export const PRICE_RANGE_DATA = {
+    MIN_LIMIT: 0,
+    MAX_LIMIT: 1000,
+    DEFAULT_MIN: 150,
+    DEFAULT_MAX: 1000,
+    STEP: 1, // Changes price in increments of 10
+    CURRENCY: "₺",
+};

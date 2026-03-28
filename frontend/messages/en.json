@@ -49,6 +49,11 @@
 			"one": "New Arrivals",
 			"two": "Discounted Products",
 			"three": "Free Shipment"
+		},
+		"Price": {
+			"title": "Price Range",
+			"currency": "$",
+			"separator": " - "
 		}
 	}
 }

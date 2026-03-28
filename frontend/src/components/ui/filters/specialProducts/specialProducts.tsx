@@ -9,12 +9,12 @@ export const Sp = () => {
     const sizeList = SP_DATA[0].ids;
 
     return (
-        <div className="p-6 pt-4 bg-white rounded-xl border border-slate-200 text-slate-900 shadow-lg max-w-56 ml-12 max-h-60 flex flex-col">
+        <div className="p-6 pt-4 bg-white rounded-xl border border-slate-200 text-slate-900 shadow-lg max-w-64 ml-12 max-h-60 flex flex-col">
             <div className="mb-6">
-                <h3 className="font-bold text-lg">{t("sizeTitle")}</h3>
+                <h3 className="font-bold text-lg">{t("spTitle")}</h3>
             </div>
 
-            <div className="flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="flex flex-col gap-4 overflow-y-auto pr-2 ">
                 {sizeList.map((item) => (
                     <div
                         key={item.id}
