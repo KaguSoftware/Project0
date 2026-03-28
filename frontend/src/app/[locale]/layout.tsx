@@ -7,6 +7,9 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/src/i18n/routing";
 
+export default async function LocaleLayout({
+	children,
+	params,
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
@@ -32,11 +35,15 @@ export default async function RootLayout({
 }) {
     const { locale } = await params;
 
+	if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
+		notFound();
+	}
     // Ensure that the incoming `locale` is valid
     if (!routing.locales.includes(locale as any)) {
         notFound();
     }
 
+	return children;
     const messages = await getMessages();
 
     // Select the primary font variable based on locale
