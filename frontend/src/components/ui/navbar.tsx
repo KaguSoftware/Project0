@@ -272,10 +272,28 @@ export default function Navbar() {
                     <button
                         type="button"
                         onClick={() => setIsOpen((prev) => !prev)}
-                        className="relative z-[1002] text-neutral-900"
+                        className="relative z-1002 flex h-6 w-6 items-center justify-center text-neutral-900"
                         aria-label={isOpen ? "Close menu" : "Open menu"}
                     >
-                        {isOpen ? <X size={24} /> : <MenuIcon size={24} />}
+                        <span
+                            className={`absolute transition-all duration-300 ease-in-out ${
+                                isOpen
+                                    ? "rotate-90 scale-75 opacity-0"
+                                    : "rotate-0 scale-100 opacity-100"
+                            }`}
+                        >
+                            <MenuIcon size={24} />
+                        </span>
+
+                        <span
+                            className={`absolute transition-all duration-300 ease-in-out ${
+                                isOpen
+                                    ? "rotate-0 scale-100 opacity-100"
+                                    : "-rotate-90 scale-75 opacity-0"
+                            }`}
+                        >
+                            <X size={24} />
+                        </span>
                     </button>
 
                     <LanguageMenu
