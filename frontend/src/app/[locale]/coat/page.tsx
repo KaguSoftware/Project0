@@ -17,10 +17,8 @@ export default function CategoryTemplatePage() {
 				</div>
 
 				<div className="flex flex-col lg:flex-row gap-8">
-					{/* Sidebar Area for your Filters */}
 					<aside className="w-full lg:w-72 shrink-0">
 						<div className="sticky top-24">
-							{/* This imports your existing filters component */}
 							<Filters />
 						</div>
 					</aside>
