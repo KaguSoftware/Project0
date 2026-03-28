@@ -13,9 +13,6 @@ export default async function LocaleLayout({
 	if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
 		notFound();
 	}
-	if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
-		notFound();
-	}
 
 	return children;
 }

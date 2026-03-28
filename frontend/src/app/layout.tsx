@@ -2,6 +2,7 @@ import { Geist, IBM_Plex_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getLocale } from "next-intl/server";
+import { Footer } from "../components/footer/footer";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default async function RootLayout({
 			>
 				<NextIntlClientProvider messages={messages}>
 					{children}
+					<Footer />
 				</NextIntlClientProvider>
 			</body>
 		</html>

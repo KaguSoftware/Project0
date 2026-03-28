@@ -20,6 +20,17 @@
 			"two": "Upper Body Outfits",
 			"three": "Lower Body Outfits",
 			"four": "Shoes"
+		},
+		"icon": {
+			"one": "Instagram",
+			"oneLink": "https://instagram.com",
+			"onePath": "/icons/instagram.svg",
+			"two": "Whatsapp",
+			"twoLink": "https://whatsapp.com",
+			"twoPath": "/icons/whatsapp.svg",
+			"four": "Twitter",
+			"fourLink": "https://twitter.com",
+			"fourPath": "/icons/twitter.svg"
 		}
 	}
 }
