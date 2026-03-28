@@ -32,5 +32,55 @@
 			"fourLink": "https://twitter.com",
 			"fourPath": "/icons/twitter.svg"
 		}
+	},
+	"nav": {
+		"links": {
+			"one": "New season",
+			"two": "T-shirt",
+			"three": "Sweats",
+			"four": "Tops",
+			"five": "Jacket",
+			"six": "Pants",
+			"seven": "Puffer",
+			"eight": "Jeans",
+			"nine": "Shorts",
+			"ten": "Set",
+			"eleven": "Accesories",
+			"twelve": "Shoes",
+			"thirteen": "Discount"
+		}
+	},
+	"Filters": {
+		"categoriesTitle": "Categories",
+		"category": {
+			"one": "Electronics",
+			"two": "Fashion",
+			"three": "Home & Garden",
+			"four": "Sports",
+			"five": "Health & Beauty",
+			"six": "Toys",
+			"seven": "Automotive",
+			"eight": "Books"
+		},
+		"sizeTitle": "Sizes",
+		"size": {
+			"one": "XS",
+			"two": "S",
+			"three": "M",
+			"four": "L",
+			"five": "XL",
+			"six": "XXL"
+		},
+		"spTitle": "Filters",
+		"sp": {
+			"one": "New Arrivals",
+			"two": "Discounted Products",
+			"three": "Free Shipment"
+		},
+		"Price": {
+			"title": "Price Range",
+			"currency": "$",
+			"separator": " - "
+		}
 	}
 }
