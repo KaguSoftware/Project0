@@ -10,5 +10,6 @@ export interface Product {
     item_description: string;
     manken_height: string;
     manken_kg: string;
+    manken_size: string;
 
 }

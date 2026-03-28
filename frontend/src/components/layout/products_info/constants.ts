@@ -15,6 +15,8 @@ export const PRODUCTS: Product[] = [
         item_description: "Urun yuzde 500 keten gomlek pantalon corap her turlu pamuk ve makinede yikanir Urun yuzde 500 keten gomlek pantalon corap her turlu pamuk ve makinede yikanir Urun yuzde 500 keten gomlek pantalon corap her turlu pamuk ve makinede yikanir",
         manken_height: "175",
         manken_kg: "75",
+        manken_size: "M"
+
     },
     {
         id: "2",
@@ -31,6 +33,7 @@ export const PRODUCTS: Product[] = [
         item_description: "Urun yuzde 500dhjgksadhjghjadghjad Urun yuzde 500 keten gomlek pantalon corap her turlu pamuk ve makinede yikanir Urun yuzde 500 keten gomlek pantalon corap her turlu pamuk ve makinede yikanir",
         manken_height: "180",
         manken_kg: "81",
+        manken_size: "L"
     }
 
 ]
