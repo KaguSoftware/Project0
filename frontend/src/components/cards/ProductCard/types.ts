@@ -8,3 +8,6 @@ export type Product = {
 export interface ProductCardProps {
     product: Product;
 }
+export interface addToCartText {
+    addToCartText: string;
+}
