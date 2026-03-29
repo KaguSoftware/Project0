@@ -29,7 +29,7 @@ export default function EmailForm() {
 	}
 
 	return (
-		<div className="min-h-screen bg-black pt-44 pb-20 px-6">
+		<div className="min-h-screen pt-44 pb-20 px-6">
 			<div className="mx-auto max-w-2xl">
 				<motion.div
 					variants={fadeUpVariant}
@@ -38,54 +38,54 @@ export default function EmailForm() {
 					className="space-y-12"
 				>
 					<div className="space-y-4">
-						<h1 className="text-5xl md:text-7xl font-black text-white uppercase tracking-tighter leading-none">
+						<h1 className="text-5xl md:text-7xl font-black text-gray-800 uppercase tracking-tighter leading-none">
 							{t("title")}
 						</h1>
-						<div className="h-1.5 w-24 bg-blue-600" />
+						<div className="h-1.5 w-24 bg-gray-400" />
 					</div>
 
 					<form onSubmit={handleSubmit} className="space-y-8">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 							<div className="space-y-3">
-								<label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">
+								<label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 ml-1">
 									{t("name")}
 								</label>
 								<input
 									name="name"
 									type="text"
 									required
-									className="w-full rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-white placeholder:text-zinc-700 focus:border-white focus:outline-none transition-all"
+									className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-5 text-black placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all"
 								/>
 							</div>
 							<div className="space-y-3">
-								<label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">
+								<label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 ml-1">
 									{t("email")}
 								</label>
 								<input
 									name="email"
 									type="email"
 									required
-									className="w-full rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-white placeholder:text-zinc-700 focus:border-white focus:outline-none transition-all"
+									className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-5 text-black placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all"
 								/>
 							</div>
 						</div>
 
 						<div className="space-y-3">
-							<label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">
+							<label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 ml-1">
 								{t("details")}
 							</label>
 							<textarea
 								name="message"
 								required
 								rows={6}
-								className="w-full rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 text-white placeholder:text-zinc-700 focus:border-white focus:outline-none transition-all resize-none"
+								className="w-full rounded-xl border border-neutral-200 bg-neutral-50 p-5 text-black placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all resize-none"
 							/>
 						</div>
 
 						<button
 							type="submit"
 							disabled={loading}
-							className="group relative w-full overflow-hidden rounded-xl bg-white py-6 font-black uppercase tracking-[0.3em] text-black transition-all hover:bg-zinc-200 disabled:opacity-50"
+							className="group relative w-full overflow-hidden rounded-xl bg-gray-800 py-6 font-black uppercase tracking-[0.3em] text-white transition-all hover:bg-neutral-800 disabled:opacity-50"
 						>
 							<div className="relative z-10 flex items-center justify-center gap-3">
 								{loading ? (
@@ -115,8 +115,8 @@ export default function EmailForm() {
 								exit="exit"
 								className={`flex items-center gap-4 rounded-xl p-6 border ${
 									status === "success"
-										? "border-green-500/20 bg-green-500/10 text-green-500"
-										: "border-red-500/20 bg-red-500/10 text-red-500"
+										? "border-green-500/20 bg-green-50 text-green-600"
+										: "border-red-500/20 bg-red-50 text-red-600"
 								}`}
 							>
 								{status === "success" ? (
