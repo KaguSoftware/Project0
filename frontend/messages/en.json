@@ -45,22 +45,50 @@
 			"fourPath": "/icons/twitter.svg"
 		}
 	},
-	"nav": {
-		"links": {
-			"one": "New season",
-			"two": "T-shirt",
-			"three": "Sweats",
-			"four": "Tops",
-			"five": "Jacket",
-			"six": "Pants",
-			"seven": "Puffer",
-			"eight": "Jeans",
-			"nine": "Shorts",
-			"ten": "Set",
-			"eleven": "Accesories",
-			"twelve": "Shoes",
-			"thirteen": "Discount"
-		}
+	"Nav": {
+		"items": [
+			{
+				"title": "Home",
+				"href": "/"
+			},
+			{
+				"title": "Shop",
+				"href": "/products",
+				"sections": [
+					{
+						"title": "Categories",
+						"links": [
+							{ "title": "T-shirt", "href": "/t-shirt" },
+							{ "title": "Pants", "href": "/trousers" },
+							{ "title": "Shoes", "href": "/shoe" }
+						]
+					},
+					{
+						"title": "Collections",
+						"links": [
+							{ "title": "New Season", "href": "/new" },
+							{ "title": "Discount", "href": "/discount" }
+						]
+					}
+				]
+			},
+			{
+				"title": "Contact",
+				"href": "/contact"
+			},
+			{
+				"title": "Coat",
+				"href": "/coat"
+			},
+			{
+				"title": "sweat",
+				"href": "/sweat"
+			},
+			{
+				"title": "Discount",
+				"href": "/discount"
+			}
+		]
 	},
 	"Filters": {
 		"categoriesTitle": "Categories",
