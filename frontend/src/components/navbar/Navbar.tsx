@@ -260,7 +260,7 @@ export default function Navbar() {
 								initial="initial"
 								animate="animate"
 								exit="exit"
-								className="fixed inset-0 z-800 bg-white px-6 pt-24 pb-8 flex flex-col"
+								className="fixed inset-0 z-40 bg-white px-6 pt-24 pb-8 flex flex-col"
 							>
 								<div className="flex flex-col gap-4">
 									{NAV_ITEMS.map((item) => (
