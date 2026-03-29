@@ -1,13 +1,13 @@
-import CategoryCard from "@/src/components/cards/CategoryCard/categoryCard";
+import CategoryGrid from "@/src/components/cards/CategoryCard/categoryGrid";
+import { CATEGORIES } from "@/src/components/cards/CategoryCard/constants";
 import LocationCard from "@/src/components/cards/LocationCard/LocationCard";
-import { LOCATIONS } from "@/src/components/cards/LocationCard/constants";
-import { Locationtype } from "@/src/components/cards/LocationCard/types";
 import MaxWidthWrapper from "@/src/components/ui/MaxWidthWrapper";
 
 export default function Home() {
     return (
         <main>
             <MaxWidthWrapper>
+                <CategoryGrid categories={CATEGORIES} />
                 <LocationCard />
             </MaxWidthWrapper>
         </main>
