@@ -11,6 +11,7 @@ export default async function LocaleLayout({
         <>
             <Navbar />
             {children}
+            <WaButton />
             <Footer />
         </>
     );
