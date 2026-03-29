@@ -1,4 +1,16 @@
 {
+    "Products": {
+        "productCardTitle": {
+            "1": "hello",
+            "2": "my",
+            "3": "name",
+            "4": "is",
+            "5": "majed",
+            "6": "ahdab",
+            "7": "gang"
+        },
+        "addtocart": "Add To Cart"
+    },
     "footer": {
         "first": {
             "title": "Company",
@@ -82,6 +94,5 @@
             "currency": "$",
             "separator": " - "
         }
-    },
-    "Category": { "Discover": "Discover All" }
+    }
 }
