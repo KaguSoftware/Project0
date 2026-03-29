@@ -5,7 +5,10 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
-  // Any other Next.js config options go here
+  experimental: {
+    turbopackFileSystemCacheForDev:
+      process.env.DISABLE_TURBO_CACHE !== "true",
+  },
 };
 
 export default withNextIntl(nextConfig);

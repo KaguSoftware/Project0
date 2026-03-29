@@ -23,8 +23,8 @@ export default function ContactSmallC() {
                             <p className=" text-left text-gray-600 font-bold px-8 mx-1">{card.desc}</p>
                             <Link
                                 href={card.link}
-                                className=" px-8 py-2 self-center text-white bg-gray-600 rounded-2xl mt-4 pb-2 text-sm justify-center text-center cursor-pointer
-                        shadow-xs hover:shadow-md transition-all duration-300 hover:scale-105 " >
+                                className=" px-8 py-2 self-center text-white bg-gray-600 rounded-2xl mt-4 pb-2 mb-2 text-sm justify-center text-center cursor-pointer
+                        shadow-xs hover:shadow-md transition-all duration-300 hover:scale-105 ">
                                 {card.button}
                             </Link>
                         </div>
