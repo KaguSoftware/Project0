@@ -133,5 +133,22 @@
         "submit": "Send Message",
         "success": "Message sent successfully!",
         "error": "Failed to send message. Please try again."
+    },
+    "Carousel": { "Title": "Featured products" },
+    "User": {
+        "userpage": {
+            "welcome": "Welcome",
+            "liked": "Go to like products ",
+            "cart": "Go to cart",
+            "user": { "show": "Show user info", "hide": "Hide user info" },
+            "name": "Name",
+            "last": "Last Name",
+            "email": "Email"
+        },
+        "user": {
+            "name": "Majed",
+            "last": "Ahdab",
+            "email": "majed.ahdab@example.com"
+        }
     }
 }
