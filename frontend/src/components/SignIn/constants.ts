@@ -8,4 +8,5 @@ export const SIGNIN: Signin = {
     passwordTitle: "Password",
     passwordPlaceholder: "Enter your password",
     signin: "Sign In",
+    link: "Don't have an account? Sign up",
 };

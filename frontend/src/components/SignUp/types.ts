@@ -1,15 +1,18 @@
-export interface Signin {
+export interface Signup {
     title: string;
     desc: string;
+    nameTitle: string;
+    namePlaceholder: string;
     emailTitle: string;
     emailPlaceholder: string;
     passwordTitle: string;
     passwordPlaceholder: string;
-    signin: string;
+    signup: string;
     link: string;
 }
 
-export interface SigninFormData {
+export interface SignupFormData {
     email: string;
     password: string;
+    name: string;
 }
