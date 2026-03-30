@@ -10,8 +10,8 @@ export default function UserPage() {
     const [showInfo, setShowInfo] = useState(false);
     const t = useTranslations();
     return (
-        <div className="mx-auto flex max-w-md flex-col relative top-15 items-center gap-4 justify-between rounded-xl border bg-white p-6 h-160 shadow-sm">
-            <h1 className="text-5xl flex flex-col items-center border mt-25 gap-4 p-4 rounded-full font-bold">
+        <div className="mx-auto flex max-w-md flex-col relative top-15 items-center gap-4 w-[90%] justify-between rounded-xl border bg-white p-6 md:h-160 h-140 shadow-sm">
+            <h1 className="text-5xl flex flex-col items-center border md:mt-25 mt-10 gap-4 p-4 rounded-full font-bold">
                 <User className="size-12" />
             </h1>
             <h2 className="text-3xl">{t(USERPAGE.welcome)}</h2>
