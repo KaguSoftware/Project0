@@ -61,15 +61,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 			<div className="text-center flex flex-col gap-1 m-3 px-2 bottom-0">
 				<h3 className="text-md font-bold text-black group-hover/card:underline truncate">
-					{t(product.title)}
+					{product.title}
 				</h3>
 				<div className="flex justify-center items-center gap-2 text-sm">
-					<h1 className="text-gray-500 line-through">
-						{product.originalPrice}
-					</h1>
-					<h2 className="text-black font-bold">
-						{product.currentPrice}
-					</h2>
+					{/* <h1 className="text-gray-500 line-through">
+						{product.price}
+					</h1> */}
+					<h2 className="text-black font-bold">{product.price}</h2>
 				</div>
 			</div>
 		</Link>
