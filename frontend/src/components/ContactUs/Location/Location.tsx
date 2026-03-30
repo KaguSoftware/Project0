@@ -10,7 +10,7 @@ export default function LocationsContact() {
                 {LOCATIONS.map((location) => (
                     <div
                         key={location.id}
-                        className="text-center items-center shadow-xs rounded-b-2xl hover:shadow-md transition-all duration-400"
+                        className="text-center mb-10 items-center shadow-xs rounded-b-2xl hover:shadow-md transition-all duration-400"
                     >
                         <div className="p-5 rounded-t-xl flex flex-col justify-center bg-gray-800 text-center items-center">
                             <h3 className="text-lg font-bold text-white flex gap-3 ">
@@ -22,12 +22,11 @@ export default function LocationsContact() {
                         <iframe
                             src={location.map}
                             width="100%"
-                            height="600"
                             style={{ border: 0 }}
                             allowFullScreen
                             loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
-                            className="w-full rounded-b-2xl shadow-xs"
+                            className="w-full md:h-150 h-100 rounded-b-2xl shadow-xs"
                         />
                     </div>
                 ))}
