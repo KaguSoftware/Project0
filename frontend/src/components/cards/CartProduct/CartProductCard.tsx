@@ -31,10 +31,9 @@ export default function CartProductCard({ product }: cartProductCardProps) {
                 <div className=" flex justify-center w-full md:p-3 p-1 h-full">
                     <div className="flex md:flex-col justify-between w-full p-1">
                         <h3 className="md:text-3xl text-xs font-bold text-black ">
-                            {t(product.title)} this is a product title like
-                            sleave or
+                            {t(product.title)}
                         </h3>
-                        <p className="md:text-2xl self-center md:mr-auto text-sm font-bold bg-gray-50 w-fit h-fit md:px-6 md:py-2 py-1 px-2 rounded-full">
+                        <p className="md:text-2xl self-center md:mr-auto text-gray-700 text-sm font-bold bg-gray-50 w-fit h-fit md:px-6 md:py-2 py-1 px-2 rounded-full">
                             {product.size}
                         </p>
                     </div>

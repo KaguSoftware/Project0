@@ -1,5 +1,17 @@
 {
     "Products": {
+        "ProductPage": {
+            "sizetext": "Size",
+            "addtocart": "Add To Cart",
+            "whatsapp": "Message us on Whatsapp",
+            "maniken": "Mannequin",
+            "height": "Height",
+            "weight": "Weight",
+            "mansize": "Mannequin size",
+            "colors": "Color options",
+            "desc": "Product Description",
+            "linktext": "I have a question about this product "
+        },
         "productCardTitle": {
             "1": "hello",
             "2": "my",

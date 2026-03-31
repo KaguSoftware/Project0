@@ -2,9 +2,10 @@ import Image from "next/image";
 import { MessageCircle, Ruler, Weight, Shirt } from "lucide-react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { PRODUCTPAGE } from "./constants";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
-
 const STRAPI_URL =
     process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
@@ -60,6 +61,7 @@ export default async function ProductDetail({
     params: Promise<{ locale: string; slug: string }>;
 }) {
     const { locale, slug } = await params;
+    const t = await getTranslations();
 
     const strapiProduct = await getProduct(slug, locale);
 
@@ -99,7 +101,8 @@ export default async function ProductDetail({
 
                     <div className="justify-items-center">
                         <p className="font-bold text-sm mt-6">
-                            RENK SEÇENEKLERİ
+                            {" "}
+                            {t(PRODUCTPAGE.colors)}
                         </p>
                         <div className="flex mt-2 gap-4 flex-wrap justify-center">
                             {allImages.map((img: any, index: number) => (
@@ -110,7 +113,7 @@ export default async function ProductDetail({
                                     width={75}
                                     height={75}
                                     unoptimized
-                                    className="object-cover rounded-xl w-[75px] h-[75px]"
+                                    className="object-cover rounded-xl w-75px h-75px"
                                 />
                             ))}
                         </div>
@@ -131,7 +134,7 @@ export default async function ProductDetail({
                     {strapiProduct.description && (
                         <>
                             <h2 className="font-semibold text-xl mt-4">
-                                Ürün Açıklaması
+                                {t(PRODUCTPAGE.desc)}
                             </h2>
                             <p className="text-gray-500 tracking-tight text-xl mt-2 max-w-200">
                                 {strapiProduct.description}
@@ -142,7 +145,7 @@ export default async function ProductDetail({
                     <div className="flex gap-8 mt-4">
                         <div>
                             <h3 className="text-gray-700 font-bold tracking-tight text-lg">
-                                BEDEN
+                                {t(PRODUCTPAGE.sizetext)}
                             </h3>
                             <div className="flex font-bold mt-2 gap-2">
                                 {sizeOptions.map((size) => (
@@ -164,15 +167,17 @@ export default async function ProductDetail({
 
                     <div className="flex flex-col gap-4 mt-6 font-bold">
                         <button className="text-black bg-neutral-100 hover:bg-black hover:text-white rounded-xl duration-300 shadow-xl h-14">
-                            SEPETE EKLE
+                            {t(PRODUCTPAGE.addtocart)}
                         </button>
 
                         <Link
-                            href={`https://wa.me/905372825347?text=bu urunle ilgili soru soracaktim:${strapiProduct.title}`}
+                            href={`https://wa.me/905372825347?text=${t(
+                                PRODUCTPAGE.linktext
+                            )}:${strapiProduct.title}`}
                             className="text-white flex gap-4 items-center justify-center h-14 shadow-xl rounded-xl hover:bg-green-400 duration-300 bg-green-500"
                         >
                             <MessageCircle className="hover:fill-white duration-300 hover:text-green-600" />
-                            WHATSAPPtan iletisime gec
+                            {t(PRODUCTPAGE.whatsapp)}
                         </Link>
                     </div>
 
@@ -180,26 +185,31 @@ export default async function ProductDetail({
                         strapiProduct.modelWeight ||
                         strapiProduct.modelSize) && (
                         <div className="text-lg text-center md:text-left mt-4">
-                            <h4 className="font-bold">Mankenin Ölçüleri:</h4>
+                            <h4 className="font-bold">
+                                {t(PRODUCTPAGE.maniken)}:
+                            </h4>
 
                             {strapiProduct.modelHeight && (
                                 <p className="flex gap-2">
                                     <Ruler className="hover:fill-gray-400" />
-                                    Boy: {strapiProduct.modelHeight}
+                                    {t(PRODUCTPAGE.height)}:{" "}
+                                    {strapiProduct.modelHeight}
                                 </p>
                             )}
 
                             {strapiProduct.modelWeight && (
                                 <p className="flex gap-2">
                                     <Weight className="hover:fill-gray-400" />
-                                    Kilo: {strapiProduct.modelWeight}
+                                    {t(PRODUCTPAGE.weight)}:{" "}
+                                    {strapiProduct.modelWeight}
                                 </p>
                             )}
 
                             {strapiProduct.modelSize && (
                                 <p className="flex gap-2">
                                     <Shirt className="hover:fill-gray-400" />
-                                    Beden: {strapiProduct.modelSize}
+                                    {t(PRODUCTPAGE.mansize)}:{" "}
+                                    {strapiProduct.modelSize}
                                 </p>
                             )}
                         </div>
