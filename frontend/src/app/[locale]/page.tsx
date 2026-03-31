@@ -4,6 +4,7 @@ import LocationCard from "@/src/components/cards/LocationCard/LocationCard";
 import MaxWidthWrapper from "@/src/components/ui/MaxWidthWrapper";
 import ProductGrid from "@/src/components/productsGrid/products";
 import ProductCarousel from "@/src/components/carousel/ProductCarousel";
+import UserPage from "@/src/components/UserPage/Userpage";
 
 export const dynamic = "force-dynamic";
 

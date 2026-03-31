@@ -18,20 +18,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 	return (
 		<Link
-			href={`/products/${product.slug}`}
+			href={`/products/${product.id}`}
 			className="block w-full overflow-hidden rounded-2xl bg-white shadow-md group/card"
 		>
-			<div className="group relative w-auto cursor-pointer overflow-hidden rounded-t-2xl h-60 md:h-90">
-				{/* <Image
+			<div className="group relative w-auto cursor-pointer overflow-hidden rounded-t-2xl min-h-60 md:min-h-90">
+				<Image
 					src={product.imageUrl}
 					alt={product.title}
 					fill
 					className="rounded-t-2xl object-cover transition-transform duration-300 group-hover/card:scale-105"
-				/> */}
-				<img
-					src={product.imageUrl}
-					alt={product.title}
-					className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
 				/>
 
 				<button
@@ -45,7 +40,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 						className={`w-6 h-6 transition-colors duration-200 ${
 							isLiked
 								? "fill-red-500 text-red-500"
-								: "text-gray-400 hover:text-red-500"
+								: "text-black hover:text-red-500"
 						}`}
 					/>
 				</button>
