@@ -74,7 +74,7 @@ export default async function ProductDetail({
 									src={getMediaUrl(img.url)}
 									width={75}
 									height={75}
-									className="object-cover rounded-xl w-[75px] h-[75px]"
+									className="object-cover rounded-xl w-18.75 h-18.75"
 								/>
 							))}
 						</div>
