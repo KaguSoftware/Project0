@@ -10,20 +10,48 @@ const STRAPI_URL =
 	process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
 function getMediaUrl(url?: string | null) {
-	if (!url) return "/mock-images/mockshirt.png";
+	if (!url) return "/image1.jpeg";
 	if (url.startsWith("http")) return url;
 	return `${STRAPI_URL}${url}`;
+}
+
+function extractImageUrl(image: any) {
+	if (!image) return "/image1.jpeg";
+
+	if (Array.isArray(image)) {
+		return extractImageUrl(image[0]);
+	}
+
+	if (typeof image === "string") {
+		return getMediaUrl(image);
+	}
+
+	if (image.url) {
+		return getMediaUrl(image.url);
+	}
+
+	if (image.data) {
+		return extractImageUrl(image.data);
+	}
+
+	if (image.attributes?.url) {
+		return getMediaUrl(image.attributes.url);
+	}
+
+	return "/image1.jpeg";
 }
 
 async function getFeaturedProducts() {
 	try {
 		const res = await fetch(
-			`${STRAPI_URL}/api/products?filters[isFeatured][$eq]=true`,
+			`${STRAPI_URL}/api/products?filters[isFeatured][$eq]=true&populate=*`,
 			{ cache: "no-store" },
 		);
+
 		if (!res.ok) return { data: [] };
 		return await res.json();
-	} catch {
+	} catch (error) {
+		console.error("Failed to fetch featured products", error);
 		return { data: [] };
 	}
 }
@@ -31,12 +59,14 @@ async function getFeaturedProducts() {
 async function getHomepageCategories(locale: string) {
 	try {
 		const res = await fetch(
-			`${STRAPI_URL}/api/categories?locale=${locale}&populate=*`,
+			`${STRAPI_URL}/api/categories?locale=${locale}&populate[image]=true`,
 			{ cache: "no-store" },
 		);
+
 		if (!res.ok) return { data: [] };
 		return await res.json();
-	} catch {
+	} catch (error) {
+		console.error("Failed to fetch homepage categories", error);
 		return { data: [] };
 	}
 }
@@ -53,26 +83,25 @@ export default async function Home({
 		getHomepageCategories(locale),
 	]);
 
-	const featuredProducts = productsResponse.data.map((item: any) => {
-		const imagePath = Array.isArray(item.image)
-			? item.image[0]?.url
-			: item.image?.url;
+	console.log(
+		"STRAPI CATEGORIES:",
+		JSON.stringify(categoriesResponse.data, null, 2),
+	);
 
-		return {
-			id: item.documentId,
-			title: item.title,
-			price: item.price,
-			imageUrl: getMediaUrl(imagePath),
-			category: item.category?.name || "Uncategorized",
-			slug: item.slug,
-		};
-	});
+	const featuredProducts = productsResponse.data.map((item: any) => ({
+		id: item.documentId,
+		title: item.title,
+		price: item.price,
+		imageUrl: extractImageUrl(item.image),
+		category: item.category?.name || "Uncategorized",
+		slug: item.slug,
+	}));
 
 	const homepageCategories = categoriesResponse.data.map((item: any) => ({
-		id: item.id,
+		id: item.id || item.documentId,
 		title: item.name,
 		moreLink: `/categories/${item.slug}`,
-		imageUrl: getMediaUrl(item.image?.url),
+		imageUrl: extractImageUrl(item.image),
 	}));
 
 	return (
