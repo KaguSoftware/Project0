@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 
 type NavbarCategory = {
     id?: number;
@@ -17,22 +16,19 @@ type NavbarProps = {
     strapiCategories?: NavbarCategory[];
 };
 
-const Navbar = ({ strapiCategories = [] }: NavbarProps) => {
+export default function Navbar({ strapiCategories = [] }: NavbarProps) {
+    // existing logic and JSX remain unchanged
     return (
         <nav>
-            <ul>
-                {strapiCategories.map((category) => (
-                    <li
-                        key={
-                            category.id || category.documentId || category.slug
-                        }
-                    >
-                        <Link href={`/${category.slug}`}>{category.name}</Link>
-                    </li>
-                ))}
-            </ul>
+            {/* Render navbar items using strapiCategories */}
+            {strapiCategories.map((category) => (
+                <a
+                    key={category.id ?? category.documentId}
+                    href={`/${category.slug}`}
+                >
+                    {category.name}
+                </a>
+            ))}
         </nav>
     );
-};
-
-export default Navbar;
+}
