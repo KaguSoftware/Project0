@@ -1,5 +1,4 @@
 import CategoryGrid from "@/src/components/cards/CategoryCard/categoryGrid";
-import { CATEGORIES } from "@/src/components/cards/CategoryCard/constants";
 import LocationCard from "@/src/components/cards/LocationCard/LocationCard";
 import MaxWidthWrapper from "@/src/components/ui/MaxWidthWrapper";
 import ProductGrid from "@/src/components/productsGrid/products";
@@ -16,6 +15,7 @@ async function getFeaturedProducts() {
 			),
 			{ cache: "no-store" },
 		);
+
 		if (!res.ok) return { data: [] };
 		return await res.json();
 	} catch (error) {
@@ -24,10 +24,34 @@ async function getFeaturedProducts() {
 	}
 }
 
-export default async function Home() {
-	const strapiResponse = await getFeaturedProducts();
+async function getHomepageCategories(locale: string) {
+	try {
+		const res = await fetch(
+			getStrapiURL(`/api/categories?populate=*&locale=${locale}`),
+			{ cache: "no-store" },
+		);
 
-	const featuredProducts = strapiResponse.data.map((item: any) => {
+		if (!res.ok) return { data: [] };
+		return await res.json();
+	} catch (error) {
+		console.error("Failed to fetch homepage categories", error);
+		return { data: [] };
+	}
+}
+
+export default async function Home({
+	params,
+}: {
+	params: Promise<{ locale: string }>;
+}) {
+	const { locale } = await params;
+
+	const [productsResponse, categoriesResponse] = await Promise.all([
+		getFeaturedProducts(),
+		getHomepageCategories(locale),
+	]);
+
+	const featuredProducts = productsResponse.data.map((item: any) => {
 		const imagePath = Array.isArray(item.image)
 			? item.image[0]?.url
 			: item.image?.url;
@@ -42,14 +66,23 @@ export default async function Home() {
 		};
 	});
 
+	const homepageCategories = categoriesResponse.data.map((item: any) => ({
+		id: item.id,
+		title: item.name,
+		moreLink: `/products?category=${item.slug}`,
+		imageUrl: getStrapiMedia(item.image?.url),
+	}));
+
 	return (
 		<main>
 			<MaxWidthWrapper>
-				<CategoryGrid categories={CATEGORIES} />
+				<CategoryGrid categories={homepageCategories} />
+
 				<ProductCarousel
 					title="Featured Products"
 					products={featuredProducts}
 				/>
+
 				<ProductGrid products={featuredProducts} />
 				<LocationCard />
 			</MaxWidthWrapper>

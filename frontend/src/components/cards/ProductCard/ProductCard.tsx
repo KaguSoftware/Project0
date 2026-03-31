@@ -46,7 +46,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 				<button
 					onClick={(e) => {
-						e.preventDefault(); // stops the card link from triggering
+						e.preventDefault();
 						// cart logic here later
 						console.log("Added to cart!");
 					}}
@@ -63,9 +63,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
 					{product.title}
 				</h3>
 				<div className="flex justify-center items-center gap-2 text-sm">
-					{/* <h1 className="text-gray-500 line-through">
-						{product.price}
-					</h1> */}
 					<h2 className="text-black font-bold">{product.price}</h2>
 				</div>
 			</div>
