@@ -3,7 +3,7 @@ import { MessageCircle, Ruler, Weight, Shirt } from "lucide-react";
 
 async function getProduct(id: string) {
 	const res = await fetch(
-		`http://127.0.0.1:1337/api/products?filters[documentId][$eq]=${id}&populate=*`,
+		`http://127.0.0.1:1337/api/products?filters[slug][$eq]=${id}&populate=*`,
 		{ cache: "no-store" },
 	);
 

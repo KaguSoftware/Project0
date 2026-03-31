@@ -1,3 +1,4 @@
+import { Footer } from "@/src/components/footer/footer";
 import Navbar from "@/src/components/navbar/Navbar";
 
 async function getNavbarCategories() {
@@ -15,25 +16,22 @@ async function getNavbarCategories() {
 	}
 }
 
-export default async function RootLayout({
+export default async function LocaleLayout({
 	children,
 	params,
 }: {
 	children: React.ReactNode;
 	params: Promise<{ locale: string }>;
 }) {
-	const resolvedParams = await params;
-	const locale = resolvedParams.locale;
+	await params;
 
 	const categories = await getNavbarCategories();
 
 	return (
-		<html lang={locale}>
-			<body>
-				<Navbar strapiCategories={categories} />
-
-				{children}
-			</body>
-		</html>
+		<>
+			<Navbar strapiCategories={categories} />
+			{children}
+			<Footer />
+		</>
 	);
 }

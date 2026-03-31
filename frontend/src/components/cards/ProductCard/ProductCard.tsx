@@ -18,15 +18,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 	return (
 		<Link
-			href={`/products/${product.id}`}
+			href={`/products/${product.slug}`}
 			className="block w-full overflow-hidden rounded-2xl bg-white shadow-md group/card"
 		>
 			<div className="group relative w-auto cursor-pointer overflow-hidden rounded-t-2xl h-60 md:h-90">
-				<Image
+				{/* <Image
 					src={product.imageUrl}
 					alt={product.title}
 					fill
 					className="rounded-t-2xl object-cover transition-transform duration-300 group-hover/card:scale-105"
+				/> */}
+				<img
+					src={product.imageUrl}
+					alt={product.title}
+					className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
 				/>
 
 				<button

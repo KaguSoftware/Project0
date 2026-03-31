@@ -1,6 +1,8 @@
 import { Filters } from "@/src/components/ui/filters/filters";
 import ProductGrid from "@/src/components/productsGrid/products";
 
+export const dynamic = "force-dynamic";
+
 async function getProducts() {
 	const res = await fetch("http://127.0.0.1:1337/api/products", {
 		cache: "no-store",
@@ -19,7 +21,7 @@ export default async function ProductList() {
 	const formattedProducts = strapiResponse.data.map((item: any) => {
 		const imageUrl = item.image?.[0]?.url
 			? `http://127.0.0.1:1337${item.image[0].url}`
-			: "/placeholder-image.jpg";
+			: "/mock-images/mockshirt.png";
 
 		return {
 			id: item.documentId,
