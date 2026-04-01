@@ -425,9 +425,9 @@ export default function Navbar({
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 8 }}
-                                    className="absolute right-0 top-full z-50 pt-4"
+                                    className="absolute right-0 top-full z-50 pt-5"
                                 >
-                                    <div className="w-26rem rounded-2xl border border-neutral-200 bg-white p-4 shadow-2xl">
+                                    <div className="py-5 rounded-2xl border border-neutral-200 bg-white shadow-2xl">
                                         <div className="max-h-90 overflow-y-auto">
                                             <CartProductGrid
                                                 cartproducts={CARTPRODUCTS}

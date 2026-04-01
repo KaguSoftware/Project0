@@ -12,8 +12,8 @@ export default function CartProductCard({ product }: cartProductCardProps) {
 
     return (
         <MaxWidthWrapper>
-            <div className="flex max-h-fit p-2 h-full w-full bg-black/2 rounded-2xl">
-                <div className="size-42 md:w-40 w-24 h-fit">
+            <div className="flex max-h-fit h-full w-auto bg-black/2 rounded-2xl">
+                <div className="size-42 md:w-[20%] min-w-18 w-24 h-fit">
                     {/* yall will prolly say wtf , basically the dimentions dont change this way sorry that it looks ass */}
                     <Link
                         className="rounded-2xl object-cover"
@@ -28,21 +28,21 @@ export default function CartProductCard({ product }: cartProductCardProps) {
                         />
                     </Link>
                 </div>
-                <div className=" flex justify-center w-full md:p-3 p-1 h-full">
-                    <div className="flex md:flex-col justify-between w-full p-1">
-                        <h3 className="md:text-3xl text-xs font-bold text-black ">
-                            {t(product.title)}
+                <div className=" flex p-2 justify-center w-full h-full">
+                    <div className="flex md:flex-col justify-between w-full">
+                        <h3 className="text-xl font-bold text-black line-clamp-2">
+                            {t(product.title)} wiusdbcv sdiuvcb sudgc jkbsdc
                         </h3>
-                        <p className="md:text-2xl self-center md:mr-auto text-gray-700 text-sm font-bold bg-gray-50 w-fit h-fit md:px-6 md:py-2 py-1 px-2 rounded-full">
+                        <p className=" self-center md:mr-auto text-gray-700 font-bold bg-gray-50 w-fit h-fit md:px-6 px-2 rounded-full">
                             {product.size}
                         </p>
                     </div>
                     <div className="flex gap-1">
-                        <h2 className="text-black md:text-2xl self-center font-bold">
+                        <h2 className="text-black self-center font-bold">
                             ₺{product.currentPrice}
                         </h2>
                         <button>
-                            <Trash className="text-red-400 md:size-10 size-7" />
+                            <Trash className="text-red-400 md:size-6 size-7" />
                         </button>
                     </div>
                 </div>
