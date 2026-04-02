@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/routing";
 import { ProductCardProps } from "./types";
 import { addToCart } from "./constants";
+import { formatPrice } from "@/src/lib/formatter";
 
 const ProductCard = ({ product }: ProductCardProps) => {
 	const t = useTranslations();
@@ -15,6 +16,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 	if (!product) {
 		return null;
 	}
+
 	return (
 		<Link
 			href={`/products/${product.slug}`}
@@ -28,6 +30,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 					unoptimized
 					className="rounded-t-2xl object-cover transition-transform duration-300 group-hover/card:scale-105"
 				/>
+
 				<button
 					onClick={(e) => {
 						e.preventDefault();
@@ -44,26 +47,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
 					/>
 				</button>
 
-				<button
-					onClick={(e) => {
-						e.preventDefault();
-						// cart logic here later
-						console.log("Added to cart!");
-					}}
-					className="absolute bottom-0 left-0 w-full bg-black/70 md:py-3 py-1 z-10 md:translate-y-full group-hover/card:translate-y-0 transition-transform duration-300 ease-in-out"
-				>
-					<p className="text-white text-md font-bold">
+				<div className="absolute bottom-0 left-0 w-full bg-black/70 md:py-3 py-1 z-10 md:translate-y-full group-hover/card:translate-y-0 transition-transform duration-300 ease-in-out">
+					<p className="text-white text-md font-bold text-center">
 						{t(addToCart.addToCartText)}
 					</p>
-				</button>
+				</div>
 			</div>
 
 			<div className="text-center flex flex-col gap-1 m-3 px-2 bottom-0">
 				<h3 className="text-md font-bold text-black group-hover/card:underline truncate">
 					{product.title}
 				</h3>
+
 				<div className="flex justify-center items-center gap-2 text-sm">
-					<h2 className="text-black font-bold">{product.price}</h2>
+					<h2 className="text-black font-bold">
+						{formatPrice(Number(product.price))}
+					</h2>
 				</div>
 			</div>
 		</Link>

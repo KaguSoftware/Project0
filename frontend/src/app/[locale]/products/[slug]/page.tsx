@@ -4,8 +4,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { PRODUCTPAGE } from "./constants";
 import { getTranslations } from "next-intl/server";
+import AddToCartSection from "@/src/components/cart/AddToCartSection";
+import { formatPrice } from "@/src/lib/formatter";
 
 export const dynamic = "force-dynamic";
+
 const STRAPI_URL =
 	process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
@@ -78,12 +81,12 @@ export default async function ProductDetail({
 			: [];
 
 	const sizeOptions = [
-		{ label: "XS", isAvailable: strapiProduct.sizeXS },
-		{ label: "S", isAvailable: strapiProduct.sizeS },
-		{ label: "M", isAvailable: strapiProduct.sizeM },
-		{ label: "L", isAvailable: strapiProduct.sizeL },
-		{ label: "XL", isAvailable: strapiProduct.sizeXL },
-		{ label: "XXL", isAvailable: strapiProduct.sizeXXL },
+		{ label: "XS" as const, isAvailable: strapiProduct.sizeXS },
+		{ label: "S" as const, isAvailable: strapiProduct.sizeS },
+		{ label: "M" as const, isAvailable: strapiProduct.sizeM },
+		{ label: "L" as const, isAvailable: strapiProduct.sizeL },
+		{ label: "XL" as const, isAvailable: strapiProduct.sizeXL },
+		{ label: "XXL" as const, isAvailable: strapiProduct.sizeXXL },
 	];
 
 	return (
@@ -101,9 +104,9 @@ export default async function ProductDetail({
 
 					<div className="justify-items-center">
 						<p className="font-bold text-sm mt-6">
-							{" "}
 							{t(PRODUCTPAGE.colors)}
 						</p>
+
 						<div className="flex mt-2 gap-4 flex-wrap justify-center">
 							{allImages.map((img: any, index: number) => (
 								<Image
@@ -113,7 +116,7 @@ export default async function ProductDetail({
 									width={75}
 									height={75}
 									unoptimized
-									className="object-cover rounded-xl w-75px h-75px"
+									className="object-cover rounded-xl w-[75px] h-[75px]"
 								/>
 							))}
 						</div>
@@ -127,7 +130,7 @@ export default async function ProductDetail({
 
 					<div className="flex items-center font-bold mt-2 gap-4">
 						<p className="text-black text-4xl">
-							₺{strapiProduct.price}
+							{formatPrice(Number(strapiProduct.price))}
 						</p>
 					</div>
 
@@ -142,34 +145,12 @@ export default async function ProductDetail({
 						</>
 					)}
 
-					<div className="flex gap-8 mt-4">
-						<div>
-							<h3 className="text-gray-700 font-bold tracking-tight text-lg">
-								{t(PRODUCTPAGE.sizetext)}
-							</h3>
-							<div className="flex font-bold mt-2 gap-2">
-								{sizeOptions.map((size) => (
-									<button
-										key={size.label}
-										disabled={!size.isAvailable}
-										className={`h-10 w-10 border rounded-lg duration-150 flex items-center justify-center ${
-											size.isAvailable
-												? "border-gray-400 text-black hover:bg-black hover:text-white cursor-pointer"
-												: "border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed"
-										}`}
-									>
-										{size.label}
-									</button>
-								))}
-							</div>
-						</div>
-					</div>
+					<AddToCartSection
+						productDocumentId={strapiProduct.documentId}
+						sizeOptions={sizeOptions}
+					/>
 
-					<div className="flex flex-col gap-4 mt-6 font-bold">
-						<button className="text-black bg-neutral-100 hover:bg-black hover:text-white rounded-xl duration-300 shadow-xl h-14">
-							{t(PRODUCTPAGE.addtocart)}
-						</button>
-
+					<div className="flex flex-col gap-4 mt-4 font-bold">
 						<Link
 							href={`https://wa.me/905372825347?text=${t(
 								PRODUCTPAGE.linktext,
