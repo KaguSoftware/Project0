@@ -51,7 +51,7 @@ type StrapiCartItem = {
 type StrapiCart = {
 	documentId: string;
 	sessionId: string;
-	status: "active" | "ordered";
+	cartStatus: "active" | "ordered";
 	items?: StrapiCartItem[];
 };
 
@@ -128,7 +128,7 @@ function normalizeCart(cart: StrapiCart | null): CartResponse {
 export async function findActiveCart(sessionId: string) {
 	const params = new URLSearchParams();
 	params.set("filters[sessionId][$eq]", sessionId);
-	params.set("filters[status][$eq]", "active");
+	params.set("filters[cartStatus][$eq]", "active");
 	params.set("populate", "items");
 	params.set("pagination[pageSize]", "1");
 
@@ -153,7 +153,7 @@ export async function getOrCreateActiveCart(sessionId: string) {
 			body: JSON.stringify({
 				data: {
 					sessionId,
-					status: "active",
+					cartStatus: "active",
 				},
 			}),
 		},
