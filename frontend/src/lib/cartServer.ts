@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import {
 	EMPTY_CART,
 	type AddCartItemPayload,
@@ -53,6 +54,7 @@ type StrapiCart = {
 	sessionId: string;
 	cartStatus: "active" | "ordered";
 	items?: StrapiCartItem[];
+	user?: any;
 };
 
 const SIZE_FIELD_MAP: Record<CartSize, keyof StrapiProduct> = {
@@ -125,12 +127,42 @@ function normalizeCart(cart: StrapiCart | null): CartResponse {
 	};
 }
 
+async function getStrapiUser() {
+	const cookieStore = await cookies();
+	const jwt = cookieStore.get("strapi_jwt")?.value;
+
+	if (!jwt) return null;
+
+	try {
+		const res = await fetch(getStrapiServerURL("/api/users/me"), {
+			headers: { Authorization: `Bearer ${jwt}` },
+			cache: "no-store",
+		});
+
+		if (!res.ok) return null;
+		return await res.json();
+	} catch (error) {
+		return null;
+	}
+}
+
 export async function findActiveCart(sessionId: string) {
+	const user = await getStrapiUser();
 	const params = new URLSearchParams();
-	params.set("filters[sessionId][$eq]", sessionId);
+
 	params.set("filters[cartStatus][$eq]", "active");
-	params.set("populate", "items");
+	params.append("populate", "items");
+	params.append("populate", "user");
 	params.set("pagination[pageSize]", "1");
+	params.set("sort", "updatedAt:desc"); // Grab the most recently used cart
+
+	if (user?.id) {
+		// Look for a cart belonging to the logged-in user OR this specific browser session
+		params.set("filters[$or][0][user][id][$eq]", user.id);
+		params.set("filters[$or][1][sessionId][$eq]", sessionId);
+	} else {
+		params.set("filters[sessionId][$eq]", sessionId);
+	}
 
 	const response = await strapiFetch<StrapiListResponse<StrapiCart>>(
 		`/api/carts?${params.toString()}`,
@@ -140,22 +172,39 @@ export async function findActiveCart(sessionId: string) {
 }
 
 export async function getOrCreateActiveCart(sessionId: string) {
+	const user = await getStrapiUser();
 	const existingCart = await findActiveCart(sessionId);
 
 	if (existingCart) {
+		// If they have a cart but it's not linked to their account yet, link it now
+		const needsUserLink = user?.id && !existingCart.user;
+
+		if (needsUserLink) {
+			await strapiFetch(`/api/carts/${existingCart.documentId}`, {
+				method: "PUT",
+				body: JSON.stringify({
+					data: { user: user.id },
+				}),
+			});
+		}
 		return existingCart;
+	}
+
+	// Create a brand new cart if one doesn't exist
+	const cartData: any = {
+		sessionId,
+		cartStatus: "active",
+	};
+
+	if (user?.id) {
+		cartData.user = user.id;
 	}
 
 	const created = await strapiFetch<StrapiSingleResponse<StrapiCart>>(
 		"/api/carts",
 		{
 			method: "POST",
-			body: JSON.stringify({
-				data: {
-					sessionId,
-					cartStatus: "active",
-				},
-			}),
+			body: JSON.stringify({ data: cartData }),
 		},
 	);
 
