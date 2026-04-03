@@ -11,10 +11,14 @@ import { removeFromCart } from "@/src/lib/cart-actions";
 export default function CartProductCard({ product }: cartProductCardProps) {
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	// This guarantees the image URL always points to your Strapi backend
-	const imageUrl = product.imageUrl?.startsWith("http")
-		? product.imageUrl
-		: `http://localhost:1337${product.imageUrl}`;
+	// guarantees the image URL always points to your Strapi backend
+	const rawImage = product?.imageUrl || "";
+	const imageUrl =
+		rawImage.startsWith("http") || rawImage.startsWith("data:")
+			? rawImage
+			: rawImage
+				? `http://localhost:1337${rawImage}`
+				: "/LogoNoBg.png";
 
 	const handleDelete = async () => {
 		setIsDeleting(true);

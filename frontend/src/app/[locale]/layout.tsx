@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { getOrCreateCart } from "@/src/lib/cart-actions";
 import { CartItem } from "@/src/types/cart";
+import { Toaster } from "react-hot-toast";
 
 const STRAPI_URL =
 	process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
@@ -56,6 +57,7 @@ export default async function LocaleLayout({
 				strapiCategories={categories}
 				cartItems={formattedCartItems}
 			/>
+			<Toaster position="bottom-right" />
 			{children}
 			<Footer />
 		</NextIntlClientProvider>

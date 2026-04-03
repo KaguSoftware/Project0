@@ -10,7 +10,7 @@ interface CartTandOProps {
 	cartItems: CartItem[];
 }
 
-export default function CartTandO({ cartItems }: CartTandOProps) {
+export default function CartTandO({ cartItems = [] }: CartTandOProps) {
 	const t = useTranslations();
 
 	// Calculate real total based on database price and quantity

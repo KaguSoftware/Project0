@@ -29,7 +29,7 @@ export default async function CartPage() {
 				<CartProductGrid cartproducts={formattedItems} />
 			</div>
 			<div className="w-full">
-				<CartTandO />
+				<CartTandO cartItems={formattedItems || []} />{" "}
 			</div>
 		</main>
 	);

@@ -313,7 +313,7 @@ export default function Navbar({
 									{cartItems.length}
 								</span>
 							)}
-						</div>{" "}
+						</div>
 					</Link>
 					<LanguageMenu
 						locale={locale}
@@ -432,7 +432,7 @@ export default function Navbar({
 										{cartItems.length}
 									</span>
 								)}
-							</div>{" "}
+							</div>
 						</Link>
 
 						<AnimatePresence>

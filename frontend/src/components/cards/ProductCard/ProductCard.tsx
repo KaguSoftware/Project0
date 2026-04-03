@@ -8,6 +8,7 @@ import { Link } from "@/src/i18n/routing";
 import { ProductCardProps } from "./types";
 import { addToCart } from "./constants";
 import { addToCart as addToCartAction } from "@/src/lib/cart-actions";
+import toast from "react-hot-toast";
 
 const ProductCard = ({ product }: ProductCardProps) => {
 	const t = useTranslations();
@@ -54,8 +55,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
 						setIsAdding(true);
 
-						// Using "M" as a default size for the quick-add button
-						// Make sure product.documentId and product.price match your current types
 						const result = await addToCartAction(
 							product.documentId,
 							"M",
@@ -67,11 +66,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
 						);
 
 						if (result.success) {
-							console.log("Added to cart successfully!");
+							toast.success(t(addToCart.addToCartText));
 						} else {
+							toast.error("Failed to add item");
 							console.error(result.error);
 						}
-
 						setIsAdding(false);
 					}}
 					disabled={isAdding}
