@@ -1,0 +1,29 @@
+{
+  "kind": "collectionType",
+  "collectionName": "userdbs",
+  "info": {
+    "singularName": "userdb",
+    "pluralName": "userdbs",
+    "displayName": "userdb"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "email": {
+      "type": "string",
+      "required": true
+    },
+    "pass": {
+      "type": "password",
+      "private": true,
+      "required": true,
+      "minLength": 8
+    },
+    "name": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
