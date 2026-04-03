@@ -7,6 +7,7 @@ import MaxWidthWrapper from "../../ui/MaxWidthWrapper";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 import { removeFromCart } from "@/src/lib/cart-actions";
+import toast from "react-hot-toast";
 
 export default function CartProductCard({ product }: cartProductCardProps) {
 	const [isDeleting, setIsDeleting] = useState(false);
@@ -24,12 +25,14 @@ export default function CartProductCard({ product }: cartProductCardProps) {
 		setIsDeleting(true);
 		const result = await removeFromCart(product.documentId);
 
-		if (!result.success) {
+		if (result.success) {
+			toast.success("Item removed from cart");
+		} else {
 			console.error(result.error);
-			setIsDeleting(false); // Only re-enable if it failed, otherwise the component unmounts
+			toast.error("Failed to remove item");
+			setIsDeleting(false);
 		}
 	};
-
 	return (
 		<MaxWidthWrapper>
 			<div
@@ -46,6 +49,7 @@ export default function CartProductCard({ product }: cartProductCardProps) {
 							width={300}
 							height={400}
 							className="rounded-2xl"
+							unoptimized
 						/>
 					</Link>
 				</div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PRODUCTPAGE } from "./constants";
 import { getTranslations } from "next-intl/server";
 import MaxWidthWrapper from "@/src/components/ui/MaxWidthWrapper";
+import AddToCartSection from "./AddToCartSection";
 
 export const dynamic = "force-dynamic";
 const STRAPI_URL =
@@ -227,44 +228,20 @@ export default async function ProductDetail({
 								</p>
 							</>
 						)}
-						<div className="flex gap-8 mt-4">
-							<div>
-								<h3 className="text-gray-700 font-bold tracking-tight text-lg">
-									{t(PRODUCTPAGE.sizetext)}
-								</h3>
-								<div className="flex font-bold mt-2 gap-2">
-									{sizeOptions.map((size) => (
-										<button
-											key={size.label}
-											disabled={!size.isAvailable}
-											className={`h-10 w-10 border rounded-lg duration-150 flex items-center justify-center ${
-												size.isAvailable
-													? "border-gray-400 text-black hover:bg-black hover:text-white cursor-pointer"
-													: "border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed"
-											}`}
-										>
-											{size.label}
-										</button>
-									))}
-								</div>
-							</div>
-						</div>
-						<div className="flex flex-col gap-4 mt-6 font-bold">
-							<button className="text-black bg-neutral-100 hover:bg-black hover:text-white rounded-xl duration-300 shadow-xl h-14">
-								{t(PRODUCTPAGE.addtocart)}
-							</button>
-							<Link
-								href={`https://wa.me/905372825347?text=${encodeURIComponent(
-									`${t(PRODUCTPAGE.linktext)}: ${
-										strapiProduct.title
-									}`,
-								)}`}
-								className="text-white flex gap-4 items-center justify-center h-14 shadow-xl rounded-xl hover:bg-green-400 duration-300 bg-green-500"
-							>
-								<MessageCircle className="hover:fill-white duration-300 hover:text-green-600" />
-								{t(PRODUCTPAGE.whatsapp)}
-							</Link>
-						</div>
+						<AddToCartSection
+							documentId={strapiProduct.documentId}
+							price={strapiProduct.price}
+							title={strapiProduct.title}
+							slug={strapiProduct.slug}
+							imageUrl={mainImageUrl}
+							sizeOptions={sizeOptions}
+							translations={{
+								sizetext: t(PRODUCTPAGE.sizetext),
+								addtocart: t(PRODUCTPAGE.addtocart),
+								linktext: t(PRODUCTPAGE.linktext),
+								whatsapp: t(PRODUCTPAGE.whatsapp),
+							}}
+						/>
 						{(strapiProduct.modelHeight ||
 							strapiProduct.modelWeight ||
 							strapiProduct.modelSize) && (

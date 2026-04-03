@@ -57,7 +57,7 @@ export default async function LocaleLayout({
 				strapiCategories={categories}
 				cartItems={formattedCartItems}
 			/>
-			<Toaster position="bottom-right" />
+			<Toaster position="top-center" />
 			{children}
 			<Footer />
 		</NextIntlClientProvider>
