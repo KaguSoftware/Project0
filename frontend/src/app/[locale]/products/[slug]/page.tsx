@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { MessageCircle, Ruler, Weight, Shirt } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { PRODUCTPAGE } from "./constants";
 import { getTranslations } from "next-intl/server";
@@ -42,18 +42,85 @@ function extractImageUrl(image: any) {
     return "/mock-images/mockshirt.png";
 }
 
+function normalizeProduct(product: any) {
+    return product?.attributes ?? product;
+}
+
 async function getProduct(slug: string, locale: string) {
-    const res = await fetch(
-        `${STRAPI_URL}/api/products?filters[slug][$eq]=${encodeURIComponent(
-            slug
-        )}&locale=${locale}&populate=*`,
-        { cache: "no-store" }
-    );
+    try {
+        const res = await fetch(
+            `${STRAPI_URL}/api/products?filters[slug][$eq]=${encodeURIComponent(
+                slug
+            )}&locale=${locale}&populate=*`,
+            { cache: "no-store" }
+        );
 
-    if (!res.ok) return null;
+        if (!res.ok) return null;
 
-    const json = await res.json();
-    return json.data?.[0] || null;
+        const json = await res.json();
+        return json.data?.[0] || null;
+    } catch (error) {
+        console.error("getProduct failed:", error);
+        return null;
+    }
+}
+
+async function findProductAcrossLocales(slug: string) {
+    try {
+        const res = await fetch(
+            `${STRAPI_URL}/api/products?filters[slug][$eq]=${encodeURIComponent(
+                slug
+            )}&locale=all&populate[localizations][fields][0]=slug&populate[localizations][fields][1]=locale&populate=*`,
+            { cache: "no-store" }
+        );
+
+        if (!res.ok) return null;
+
+        const json = await res.json();
+        return json.data?.[0] || null;
+    } catch (error) {
+        console.error("findProductAcrossLocales failed:", error);
+        return null;
+    }
+}
+
+function getLocalizedSlug(
+    productFromAnyLocale: any,
+    targetLocale: string
+): string | null {
+    const directLocalizations = productFromAnyLocale?.localizations;
+
+    if (Array.isArray(directLocalizations)) {
+        const match = directLocalizations.find(
+            (entry: any) => entry?.locale === targetLocale
+        );
+        if (match?.slug) return match.slug;
+    }
+
+    if (Array.isArray(directLocalizations?.data)) {
+        const match = directLocalizations.data.find(
+            (entry: any) => entry?.attributes?.locale === targetLocale
+        );
+        if (match?.attributes?.slug) return match.attributes.slug;
+    }
+
+    const nestedLocalizations = productFromAnyLocale?.attributes?.localizations;
+
+    if (Array.isArray(nestedLocalizations)) {
+        const match = nestedLocalizations.find(
+            (entry: any) => entry?.locale === targetLocale
+        );
+        if (match?.slug) return match.slug;
+    }
+
+    if (Array.isArray(nestedLocalizations?.data)) {
+        const match = nestedLocalizations.data.find(
+            (entry: any) => entry?.attributes?.locale === targetLocale
+        );
+        if (match?.attributes?.slug) return match.attributes.slug;
+    }
+
+    return null;
 }
 
 export default async function ProductDetail({
@@ -64,11 +131,33 @@ export default async function ProductDetail({
     const { locale, slug } = await params;
     const t = await getTranslations();
 
-    const strapiProduct = await getProduct(slug, locale);
+    let strapiProduct = await getProduct(slug, locale);
+
+    if (!strapiProduct) {
+        const productFromAnyLocale = await findProductAcrossLocales(slug);
+        const normalizedAnyLocaleProduct =
+            normalizeProduct(productFromAnyLocale);
+
+        if (productFromAnyLocale) {
+            const localizedSlug = getLocalizedSlug(
+                productFromAnyLocale,
+                locale
+            );
+
+            if (localizedSlug && localizedSlug !== slug) {
+                redirect(`/${locale}/products/${localizedSlug}`);
+            }
+
+            if (normalizedAnyLocaleProduct?.locale === locale) {
+                strapiProduct = normalizedAnyLocaleProduct;
+            }
+        }
+    }
 
     if (!strapiProduct) {
         notFound();
     }
+    strapiProduct = normalizeProduct(strapiProduct);
 
     const mainImageUrl = extractImageUrl(strapiProduct.image);
 
@@ -166,9 +255,11 @@ export default async function ProductDetail({
                                 {t(PRODUCTPAGE.addtocart)}
                             </button>
                             <Link
-                                href={`https://wa.me/905372825347?text=${t(
-                                    PRODUCTPAGE.linktext
-                                )}:${strapiProduct.title}`}
+                                href={`https://wa.me/905372825347?text=${encodeURIComponent(
+                                    `${t(PRODUCTPAGE.linktext)}: ${
+                                        strapiProduct.title
+                                    }`
+                                )}`}
                                 className="text-white flex gap-4 items-center justify-center h-14 shadow-xl rounded-xl hover:bg-green-400 duration-300 bg-green-500"
                             >
                                 <MessageCircle className="hover:fill-white duration-300 hover:text-green-600" />

@@ -3,10 +3,13 @@ import Navbar from "@/src/components/navbar/Navbar";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 
+const STRAPI_URL =
+    process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
+
 async function getNavbarCategories() {
     try {
         const res = await fetch(
-            "http://127.0.0.1:1337/api/categories?filters[showInNavbar][$eq]=true",
+            `${STRAPI_URL}/api/categories?filters[showInNavbar][$eq]=true`,
             { cache: "no-store" }
         );
         if (!res.ok) return [];
