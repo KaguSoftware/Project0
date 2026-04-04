@@ -7,9 +7,11 @@ export type Product = {
     slug?: string;
     isLiked?: boolean;
 };
+
 export interface ProductCardProps {
     product: Product;
 }
+
 export interface addToCartText {
     addToCartText: string;
 }

@@ -8,6 +8,8 @@ import { Link } from "@/src/i18n/routing";
 import { ToggleLikeProductAction } from "@/src/app/actions";
 import { ProductCardProps } from "./types";
 import { addToCart } from "./constants";
+import { addToCart as addToCartAction } from "@/src/lib/cart-actions";
+import toast from "react-hot-toast";
 
 const ProductCard = ({ product }: ProductCardProps) => {
     const t = useTranslations();
