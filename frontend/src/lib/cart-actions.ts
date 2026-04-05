@@ -148,7 +148,7 @@ export async function addToCart(
                     titleSnapshot: title,
                     slugSnapshot: slug,
                     imageSnapshot: imageUrl,
-                    cart_item: cart.documentId,
+                    cart: cart.documentId,
                     product: productDocumentId,
                     publishedAt: new Date().toISOString(),
                 },
@@ -156,11 +156,12 @@ export async function addToCart(
             cache: "no-store",
         });
 
+        const responseData = await response.json();
+
         if (!response.ok) {
-            const errorData = await response.json();
             console.error(
                 "Strapi rejected the cart item:",
-                JSON.stringify(errorData, null, 2)
+                JSON.stringify(responseData, null, 2)
             );
             return { success: false, error: "Failed to save item." };
         }
