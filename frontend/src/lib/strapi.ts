@@ -1,13 +1,17 @@
 const STRAPI_URL =
+    process.env.STRAPI_URL?.replace(/\/$/, "") ||
     process.env.NEXT_PUBLIC_STRAPI_URL?.replace(/\/$/, "") ||
     "http://localhost:1337";
 
+const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
+
 if (
+    !process.env.STRAPI_URL &&
     !process.env.NEXT_PUBLIC_STRAPI_URL &&
     process.env.NODE_ENV === "production"
 ) {
     console.warn(
-        "NEXT_PUBLIC_STRAPI_URL is not set in production. Falling back to localhost, which will fail on the deployed site."
+        "STRAPI_URL / NEXT_PUBLIC_STRAPI_URL is not set in production. Falling back to localhost, which will fail on the deployed site."
     );
 }
 
@@ -101,10 +105,16 @@ export async function strapiFetch<T = any>(
         ? `${getStrapiURL(path)}?${queryString}`
         : getStrapiURL(path);
 
+    const mergedHeaders = new Headers(headers);
+
+    if (STRAPI_API_TOKEN && !mergedHeaders.has("Authorization")) {
+        mergedHeaders.set("Authorization", `Bearer ${STRAPI_API_TOKEN}`);
+    }
+
     const res = await fetch(url, {
         method,
         body,
-        headers,
+        headers: mergedHeaders,
         cache,
         next: {
             revalidate: next?.revalidate ?? revalidate,
