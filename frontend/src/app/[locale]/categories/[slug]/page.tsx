@@ -310,6 +310,31 @@ async function getJwtFromCookie() {
 }
 
 
+const LOCALES = ["tr", "en", "ar"];
+
+export async function generateStaticParams() {
+    const results: { locale: string; slug: string }[] = [];
+
+    for (const locale of LOCALES) {
+        try {
+            const json = await strapiPublicFetch<{ data: any[] }>("/api/categories", {
+                query: {
+                    locale,
+                    fields: ["slug"],
+                    pagination: { pageSize: 100 },
+                },
+            });
+            for (const category of json.data ?? []) {
+                if (category.slug) results.push({ locale, slug: category.slug });
+            }
+        } catch {
+            // if Strapi is down at build time, skip static generation for this locale
+        }
+    }
+
+    return results;
+}
+
 export default async function CategoryPage({
     params,
     searchParams,

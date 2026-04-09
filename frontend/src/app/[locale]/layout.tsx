@@ -2,6 +2,7 @@ import { Footer } from "@/src/components/footer/footer";
 import Navbar from "@/src/components/navbar/Navbar";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { cookies } from "next/headers";
 import { getOrCreateCart } from "@/src/lib/cart-actions";
 import { CartItem } from "@/src/types/cart";
 import { Toaster } from "react-hot-toast";
@@ -44,9 +45,12 @@ export default async function LocaleLayout({
     const { locale } = await params;
     const messages = await getMessages();
 
+    const cookieStore = await cookies();
+    const cartSessionId = cookieStore.get("cartSessionId")?.value;
+
     const [categories, cartData] = await Promise.all([
         getNavbarCategories(),
-        getOrCreateCart(),
+        cartSessionId ? getOrCreateCart(cartSessionId) : Promise.resolve(null),
     ]);
 
     const rawItems = Array.isArray(cartData?.cart_items)

@@ -49,32 +49,6 @@ async function getStrapiHeaders(includeJson = false) {
     };
 }
 
-async function getEntityIdByDocumentId(
-    collection: string,
-    documentId: string,
-    label: string,
-    locale = "all"
-) {
-    try {
-        const data = await strapiPrivateFetch<
-            StrapiCollectionResponse<Record<string, never>>
-        >(`/api/${collection}`, {
-            query: {
-                locale,
-                filters: { documentId: { $eq: documentId } },
-                fields: ["id"],
-                pagination: { pageSize: 1 },
-            },
-            headers: await getStrapiHeaders(),
-        });
-
-        const entry = Array.isArray(data?.data) ? data.data[0] : null;
-        return typeof entry?.id === "number" ? entry.id : null;
-    } catch (error) {
-        console.error(`Failed to resolve ${label} id from documentId:`, error);
-        return null;
-    }
-}
 
 export async function getCartSessionId() {
     const cookieStore = await cookies();
@@ -175,21 +149,9 @@ export async function addToCart(
 
     if (!cart) return { success: false, error: "Could not get cart session" };
 
-    const cartId =
-        typeof cart?.id === "number"
-            ? cart.id
-            : cart?.documentId
-            ? await getEntityIdByDocumentId("carts", cart.documentId, "cart")
-            : null;
+    const cartId = typeof cart?.id === "number" ? cart.id : null;
 
-    const productRelationValue = await getEntityIdByDocumentId(
-        "products",
-        productDocumentId,
-        "product",
-        currentLocale
-    );
-
-    if (!cartId || !productRelationValue) {
+    if (!cartId) {
         return { success: false, error: "Failed to save item." };
     }
 
@@ -209,7 +171,7 @@ export async function addToCart(
                         slugSnapshot: slug,
                         imageSnapshot: imageUrl,
                         cart_item: cartId,
-                        product: productRelationValue,
+                        product: productDocumentId,
                         locale: currentLocale,
                         publishedAt: new Date().toISOString(),
                     },

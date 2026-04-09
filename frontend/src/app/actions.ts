@@ -178,45 +178,29 @@ async function findUserDbByAuthUser(
     authUserEmail?: string,
     authUsername?: string
 ) {
-    const queries = [
-        authUserEmail
-            ? {
-                  filters: { email: { $eq: authUserEmail } },
-              }
-            : null,
-        authUsername
-            ? {
-                  filters: { username: { $eq: authUsername } },
-              }
-            : null,
-    ].filter(Boolean) as Array<{ filters: Record<string, any> }>;
+    const orClauses = [
+        authUserEmail ? { email: { $eq: authUserEmail } } : null,
+        authUsername ? { username: { $eq: authUsername } } : null,
+    ].filter(Boolean);
 
-    for (const query of queries) {
-        const json = await strapiPrivateFetch<
-            StrapiCollectionResponse<StrapiUserDbEntry>
-        >("/api/userdbs", {
-            query: {
-                ...query,
-                pagination: { pageSize: 1 },
-                populate: {
-                    likedProducts: { fields: ["id", "documentId"] },
-                },
-                fields: ["username", "email", "documentId"],
-            },
-            headers: {
-                Authorization: `Bearer ${jwt}`,
-                "Content-Type": "application/json",
-            },
-        });
+    if (orClauses.length === 0) return null;
 
-        const entry = Array.isArray(json?.data) ? json.data[0] ?? null : null;
+    const json = await strapiPrivateFetch<
+        StrapiCollectionResponse<StrapiUserDbEntry>
+    >("/api/userdbs", {
+        query: {
+            filters: { $or: orClauses },
+            pagination: { pageSize: 1 },
+            populate: { likedProducts: { fields: ["id", "documentId"] } },
+            fields: ["username", "email", "documentId"],
+        },
+        headers: {
+            Authorization: `Bearer ${jwt}`,
+            "Content-Type": "application/json",
+        },
+    });
 
-        if (entry) {
-            return entry;
-        }
-    }
-
-    return null;
+    return Array.isArray(json?.data) ? json.data[0] ?? null : null;
 }
 
 async function createUserDbEntry(jwt: string, user: StrapiAuthUser) {
@@ -236,30 +220,23 @@ async function createUserDbEntry(jwt: string, user: StrapiAuthUser) {
 }
 
 async function ensureUserDbEntry(jwt: string, authUser: StrapiAuthUser) {
-    let userDbEntry = await findUserDbByAuthUser(
+    const existing = await findUserDbByAuthUser(
         jwt,
         authUser.id,
         authUser.email,
         authUser.username
     );
 
-    if (!userDbEntry) {
-        await createUserDbEntry(jwt, {
-            id: authUser.id,
-            documentId: authUser.documentId,
-            username: authUser.username,
-            email: authUser.email,
-        });
+    if (existing) return existing;
 
-        userDbEntry = await findUserDbByAuthUser(
-            jwt,
-            authUser.id,
-            authUser.email,
-            authUser.username
-        );
-    }
+    const created = await createUserDbEntry(jwt, {
+        id: authUser.id,
+        documentId: authUser.documentId,
+        username: authUser.username,
+        email: authUser.email,
+    });
 
-    return userDbEntry;
+    return created?.data ?? null;
 }
 
 async function resolveProductDocumentId(
