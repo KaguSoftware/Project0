@@ -251,6 +251,34 @@ async function syncCategoryLocales(
     console.log(`[Ugarit] ── Category sync end: ${documentId}`);
 }
 
+// ─── Frontend cache revalidation ─────────────────────────────────────────────
+
+const FRONTEND_URL =
+    process.env.FRONTEND_URL?.replace(/\/$/, "") || "http://localhost:3000";
+const REVALIDATION_SECRET = process.env.REVALIDATION_SECRET || "";
+
+async function notifyFrontend(model: string, entry: any) {
+    if (!REVALIDATION_SECRET) return;
+
+    try {
+        const url = `${FRONTEND_URL}/api/revalidate?secret=${REVALIDATION_SECRET}`;
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ model, entry }),
+        });
+
+        if (!res.ok) {
+            console.error(`[Ugarit] Revalidation failed: ${res.status}`);
+        } else {
+            const data = await res.json();
+            console.log(`[Ugarit] Revalidated tags: ${data.tags?.join(", ")}`);
+        }
+    } catch (err: any) {
+        console.error(`[Ugarit] Revalidation request error: ${err.message}`);
+    }
+}
+
 // ─── Registration ────────────────────────────────────────────────────────────
 
 export default {
@@ -316,6 +344,14 @@ export default {
                             err.message
                         );
                     });
+                });
+            }
+
+            // Notify frontend to revalidate cache after publish
+            if (isPublishFromSource) {
+                const entry = { documentId, slug: result?.slug ?? result?.entries?.[0]?.slug };
+                setImmediate(() => {
+                    notifyFrontend(uid, entry).catch(() => {});
                 });
             }
 

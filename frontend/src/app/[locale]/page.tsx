@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { unstable_cache } from "next/cache";
 import CategoryGrid from "@/src/components/cards/CategoryCard/categoryGrid";
 import LocationCard from "@/src/components/cards/LocationCard/LocationCard";
 import MaxWidthWrapper from "@/src/components/ui/MaxWidthWrapper";
@@ -36,50 +37,56 @@ function extractImageUrl(image: any) {
     return "/image1.jpeg";
 }
 
-async function getFeaturedProducts(locale: string) {
-    try {
-        return await strapiPublicFetch<{ data: any[] }>("/api/products", {
-            query: {
-                locale,
-                filters: {
-                    isFeatured: {
-                        $eq: true,
+function getFeaturedProducts(locale: string) {
+    return unstable_cache(
+        async () => {
+            try {
+                return await strapiPublicFetch<{ data: any[] }>("/api/products", {
+                    query: {
+                        locale,
+                        filters: { isFeatured: { $eq: true } },
+                        fields: ["documentId", "title", "price", "slug"],
+                        populate: {
+                            image: { fields: ["url"] },
+                            category: { fields: ["name"] },
+                        },
+                        sort: ["title:asc"],
                     },
-                },
-                fields: ["documentId", "title", "price", "slug"],
-                populate: {
-                    image: { fields: ["url"] },
-                    category: { fields: ["name"] },
-                },
-                sort: ["title:asc"],
-            },
-            revalidate: 300,
-            tags: [`homepage:${locale}:featured-products`],
-        });
-    } catch (error) {
-        console.error("Failed to fetch featured products", error);
-        return { data: [] };
-    }
+                    revalidate: 300,
+                    tags: [`homepage:${locale}:featured-products`],
+                });
+            } catch (error) {
+                console.error("Failed to fetch featured products", error);
+                return { data: [] };
+            }
+        },
+        [`homepage-featured-${locale}`],
+        { revalidate: 300, tags: [`homepage:${locale}:featured-products`] }
+    )();
 }
 
-async function getHomepageCategories(locale: string) {
-    try {
-        return await strapiPublicFetch<{ data: any[] }>("/api/categories", {
-            query: {
-                locale,
-                fields: ["documentId", "name", "slug"],
-                populate: {
-                    image: { fields: ["url"] },
-                },
-                sort: ["name:asc"],
-            },
-            revalidate: 300,
-            tags: [`homepage:${locale}:categories`],
-        });
-    } catch (error) {
-        console.error("Failed to fetch homepage categories", error);
-        return { data: [] };
-    }
+function getHomepageCategories(locale: string) {
+    return unstable_cache(
+        async () => {
+            try {
+                return await strapiPublicFetch<{ data: any[] }>("/api/categories", {
+                    query: {
+                        locale,
+                        fields: ["documentId", "name", "slug"],
+                        populate: { image: { fields: ["url"] } },
+                        sort: ["name:asc"],
+                    },
+                    revalidate: 300,
+                    tags: [`homepage:${locale}:categories`],
+                });
+            } catch (error) {
+                console.error("Failed to fetch homepage categories", error);
+                return { data: [] };
+            }
+        },
+        [`homepage-categories-${locale}`],
+        { revalidate: 300, tags: [`homepage:${locale}:categories`] }
+    )();
 }
 
 async function getJwtFromCookie() {

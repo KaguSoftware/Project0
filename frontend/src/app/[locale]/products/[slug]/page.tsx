@@ -24,9 +24,11 @@ function normalizeProduct(product: any) {
 function buildProductPopulate() {
     return {
         image: { fields: ["url"] },
-        localizations: { fields: ["slug", "locale"] },
         colorVariants: {
-            populate: { color: true, image: { fields: ["url"] } },
+            populate: {
+                color: { fields: ["name", "hexCode"] },
+                image: { fields: ["url"] },
+            },
         },
     };
 }
@@ -66,6 +68,31 @@ async function getProduct(slug: string, locale: string) {
     } catch (error) {
         return null;
     }
+}
+
+const LOCALES = ["tr", "en", "ar"];
+
+export async function generateStaticParams() {
+    const results: { locale: string; slug: string }[] = [];
+
+    for (const locale of LOCALES) {
+        try {
+            const json = await strapiPublicFetch<{ data: any[] }>("/api/products", {
+                query: {
+                    locale,
+                    fields: ["slug"],
+                    pagination: { pageSize: 100 },
+                },
+            });
+            for (const product of json.data ?? []) {
+                if (product.slug) results.push({ locale, slug: product.slug });
+            }
+        } catch {
+            // if Strapi is down at build time, skip static generation for this locale
+        }
+    }
+
+    return results;
 }
 
 export default async function ProductDetail({

@@ -24,11 +24,14 @@ export default function ProductInteractive({
     translations,
     isLiked: initialIsLiked = false,
 }: any) {
-    // Build carousel: product gallery images first, then any color variant images not already included
-    const allImages: string[] = fallbackImages.length > 0 ? fallbackImages : [initialImage];
+    // Combine product images + color variant images into one carousel, deduped
+    const variantImages: string[] = colorVariants.map((cv: any) => cv.imageUrl).filter(Boolean);
+    const base: string[] = fallbackImages.length > 0 ? fallbackImages : [];
+    const extra = variantImages.filter((url: string) => !base.includes(url));
+    const allImages: string[] = [...base, ...extra].filter(Boolean);
+    if (allImages.length === 0) allImages.push(initialImage);
 
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [selectedColorImage, setSelectedColorImage] = useState<string | null>(null);
     const [activeColorId, setActiveColorId] = useState<string | number | null>(null);
     const [selectedColorName, setSelectedColorName] = useState<string>("");
     const [selectedSize, setSelectedSize] = useState<string>("");
@@ -37,15 +40,13 @@ export default function ProductInteractive({
     const [isLiked, setIsLiked] = useState(Boolean(initialIsLiked));
     const [isPending, startTransition] = useTransition();
 
-    const mainImage = selectedColorImage ?? allImages[currentIndex] ?? initialImage;
+    const mainImage = allImages[currentIndex] ?? initialImage;
 
     const prev = () => {
-        setSelectedColorImage(null);
         setActiveColorId(null);
         setCurrentIndex((i) => (i - 1 + allImages.length) % allImages.length);
     };
     const next = () => {
-        setSelectedColorImage(null);
         setActiveColorId(null);
         setCurrentIndex((i) => (i + 1) % allImages.length);
     };
@@ -193,7 +194,8 @@ export default function ProductInteractive({
                                     <button
                                         key={variant.id || index}
                                         onClick={() => {
-                                            setSelectedColorImage(variant.imageUrl);
+                                            const idx = allImages.indexOf(variant.imageUrl);
+                                            if (idx !== -1) setCurrentIndex(idx);
                                             setActiveColorId(variant.id);
                                             setSelectedColorName(variant.color?.name);
                                         }}
