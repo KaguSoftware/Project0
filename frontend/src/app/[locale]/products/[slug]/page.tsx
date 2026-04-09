@@ -1,58 +1,98 @@
-import Image from "next/image";
-import { MessageCircle, Ruler, Weight, Shirt } from "lucide-react";
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import { PRODUCTPAGE } from "./constants";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-
-export const dynamic = "force-dynamic";
-const STRAPI_URL =
-    process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
-
-function getMediaUrl(url?: string | null) {
-    if (!url) return "/mock-images/mockshirt.png";
-    if (url.startsWith("http")) return url;
-    return `${STRAPI_URL}${url}`;
-}
+import { cookies } from "next/headers";
+import { PRODUCTPAGE } from "./constants";
+import MaxWidthWrapper from "@/src/components/ui/MaxWidthWrapper";
+import ProductInteractive from "./ProductInteractive";
+import { getStrapiMedia, strapiPublicFetch } from "@/src/lib/strapi";
+import { getLikedProductIds } from "@/src/lib/user-db";
 
 function extractImageUrl(image: any) {
     if (!image) return "/mock-images/mockshirt.png";
-
-    if (Array.isArray(image)) {
-        return extractImageUrl(image[0]);
-    }
-
-    if (typeof image === "string") {
-        return getMediaUrl(image);
-    }
-
-    if (image.url) {
-        return getMediaUrl(image.url);
-    }
-
-    if (image.data) {
-        return extractImageUrl(image.data);
-    }
-
-    if (image.attributes?.url) {
-        return getMediaUrl(image.attributes.url);
-    }
-
+    if (Array.isArray(image)) return extractImageUrl(image[0]);
+    if (typeof image === "string") return getStrapiMedia(image);
+    if (image.url) return getStrapiMedia(image.url);
+    if (image.data) return extractImageUrl(image.data);
+    if (image.attributes?.url) return getStrapiMedia(image.attributes.url);
     return "/mock-images/mockshirt.png";
 }
 
+function normalizeProduct(product: any) {
+    return product?.attributes ?? product;
+}
+
+function buildProductPopulate() {
+    return {
+        image: { fields: ["url"] },
+        colorVariants: {
+            populate: {
+                color: { fields: ["name", "hexCode"] },
+                image: { fields: ["url"] },
+            },
+        },
+    };
+}
+
 async function getProduct(slug: string, locale: string) {
-    const res = await fetch(
-        `${STRAPI_URL}/api/products?filters[slug][$eq]=${encodeURIComponent(
-            slug
-        )}&locale=${locale}&populate=*`,
-        { cache: "no-store" }
-    );
+    try {
+        const json = await strapiPublicFetch<{ data?: any[] }>(
+            "/api/products",
+            {
+                query: {
+                    locale,
+                    filters: { slug: { $eq: slug } },
+                    fields: [
+                        "documentId",
+                        "title",
+                        "slug",
+                        "price",
+                        "description",
+                        "sizeXS",
+                        "sizeS",
+                        "sizeM",
+                        "sizeL",
+                        "sizeXL",
+                        "sizeXXL",
+                        "modelHeight",
+                        "modelWeight",
+                        "modelSize",
+                        "locale",
+                    ],
+                    populate: buildProductPopulate(),
+                },
+                revalidate: 300,
+                tags: [`product:${locale}:${slug}`],
+            }
+        );
+        return json.data?.[0] || null;
+    } catch (error) {
+        return null;
+    }
+}
 
-    if (!res.ok) return null;
+const LOCALES = ["tr", "en", "ar"];
 
-    const json = await res.json();
-    return json.data?.[0] || null;
+export async function generateStaticParams() {
+    const results: { locale: string; slug: string }[] = [];
+
+    for (const locale of LOCALES) {
+        try {
+            const json = await strapiPublicFetch<{ data: any[] }>("/api/products", {
+                query: {
+                    locale,
+                    fields: ["slug"],
+                    pagination: { pageSize: 100 },
+                },
+            });
+            for (const product of json.data ?? []) {
+                if (product.slug) results.push({ locale, slug: product.slug });
+            }
+        } catch {
+            // if Strapi is down at build time, skip static generation for this locale
+        }
+    }
+
+    return results;
 }
 
 export default async function ProductDetail({
@@ -63,19 +103,31 @@ export default async function ProductDetail({
     const { locale, slug } = await params;
     const t = await getTranslations();
 
-    const strapiProduct = await getProduct(slug, locale);
+    let strapiProduct = await getProduct(slug, locale);
+    if (!strapiProduct) notFound();
 
-    if (!strapiProduct) {
-        notFound();
-    }
+    strapiProduct = normalizeProduct(strapiProduct);
+
+    const cookieStore = await cookies();
+    const jwt = cookieStore.get("jwt")?.value ?? null;
+    const likedIds = jwt ? await getLikedProductIds(jwt) : [];
+    const isLiked = likedIds.includes(strapiProduct.documentId);
 
     const mainImageUrl = extractImageUrl(strapiProduct.image);
-
     const allImages = Array.isArray(strapiProduct.image)
         ? strapiProduct.image
         : strapiProduct.image
         ? [strapiProduct.image]
         : [];
+    const fallbackImages = allImages.map((img: any) => extractImageUrl(img));
+
+    const formattedColorVariants = (strapiProduct.colorVariants || [])
+        .map((cv: any) => ({
+            id: cv.id,
+            color: cv.color?.attributes || cv.color,
+            imageUrl: extractImageUrl(cv.image),
+        }))
+        .filter((cv: any) => cv.color);
 
     const sizeOptions = [
         { label: "XS", isAvailable: strapiProduct.sizeXS },
@@ -87,135 +139,38 @@ export default async function ProductDetail({
     ];
 
     return (
-        <main className="py-10 px-6">
-            <div className="md:grid md:grid-cols-2 grid-cols-1">
-                <div className="justify-items-center">
-                    <Image
-                        className="object-cover w-auto md:h-screen rounded-2xl"
-                        alt={strapiProduct.title || "Product Image"}
-                        src={mainImageUrl}
-                        width={1000}
-                        height={750}
-                        unoptimized
-                    />
-
-                    <div className="justify-items-center">
-                        <p className="font-bold text-sm mt-6">
-                            {" "}
-                            {t(PRODUCTPAGE.colors)}
-                        </p>
-                        <div className="flex mt-2 gap-4 flex-wrap justify-center">
-                            {allImages.map((img: any, index: number) => (
-                                <Image
-                                    key={index}
-                                    alt="gallery thumbnail"
-                                    src={extractImageUrl(img)}
-                                    width={75}
-                                    height={75}
-                                    unoptimized
-                                    className="object-cover rounded-xl w-75px h-75px"
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="px-6">
-                    <h1 className="text-3xl tracking-tighter font-bold md:mt-0 mt-4 max-w-200">
-                        {strapiProduct.title}
-                    </h1>
-
-                    <div className="flex items-center font-bold mt-2 gap-4">
-                        <p className="text-black text-4xl">
-                            ₺{strapiProduct.price}
-                        </p>
-                    </div>
-
-                    {strapiProduct.description && (
-                        <>
-                            <h2 className="font-semibold text-xl mt-4">
-                                {t(PRODUCTPAGE.desc)}
-                            </h2>
-                            <p className="text-gray-500 tracking-tight text-xl mt-2 max-w-200">
-                                {strapiProduct.description}
-                            </p>
-                        </>
-                    )}
-
-                    <div className="flex gap-8 mt-4">
-                        <div>
-                            <h3 className="text-gray-700 font-bold tracking-tight text-lg">
-                                {t(PRODUCTPAGE.sizetext)}
-                            </h3>
-                            <div className="flex font-bold mt-2 gap-2">
-                                {sizeOptions.map((size) => (
-                                    <button
-                                        key={size.label}
-                                        disabled={!size.isAvailable}
-                                        className={`h-10 w-10 border rounded-lg duration-150 flex items-center justify-center ${
-                                            size.isAvailable
-                                                ? "border-gray-400 text-black hover:bg-black hover:text-white cursor-pointer"
-                                                : "border-gray-200 text-gray-300 bg-gray-50 cursor-not-allowed"
-                                        }`}
-                                    >
-                                        {size.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-4 mt-6 font-bold">
-                        <button className="text-black bg-neutral-100 hover:bg-black hover:text-white rounded-xl duration-300 shadow-xl h-14">
-                            {t(PRODUCTPAGE.addtocart)}
-                        </button>
-
-                        <Link
-                            href={`https://wa.me/905372825347?text=${t(
-                                PRODUCTPAGE.linktext
-                            )}:${strapiProduct.title}`}
-                            className="text-white flex gap-4 items-center justify-center h-14 shadow-xl rounded-xl hover:bg-green-400 duration-300 bg-green-500"
-                        >
-                            <MessageCircle className="hover:fill-white duration-300 hover:text-green-600" />
-                            {t(PRODUCTPAGE.whatsapp)}
-                        </Link>
-                    </div>
-
-                    {(strapiProduct.modelHeight ||
-                        strapiProduct.modelWeight ||
-                        strapiProduct.modelSize) && (
-                        <div className="text-lg text-center md:text-left mt-4">
-                            <h4 className="font-bold">
-                                {t(PRODUCTPAGE.maniken)}:
-                            </h4>
-
-                            {strapiProduct.modelHeight && (
-                                <p className="flex gap-2">
-                                    <Ruler className="hover:fill-gray-400" />
-                                    {t(PRODUCTPAGE.height)}:{" "}
-                                    {strapiProduct.modelHeight}
-                                </p>
-                            )}
-
-                            {strapiProduct.modelWeight && (
-                                <p className="flex gap-2">
-                                    <Weight className="hover:fill-gray-400" />
-                                    {t(PRODUCTPAGE.weight)}:{" "}
-                                    {strapiProduct.modelWeight}
-                                </p>
-                            )}
-
-                            {strapiProduct.modelSize && (
-                                <p className="flex gap-2">
-                                    <Shirt className="hover:fill-gray-400" />
-                                    {t(PRODUCTPAGE.mansize)}:{" "}
-                                    {strapiProduct.modelSize}
-                                </p>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </main>
+        <MaxWidthWrapper>
+            <main className="py-10 px-6">
+                <ProductInteractive
+                    documentId={strapiProduct.documentId}
+                    price={strapiProduct.price}
+                    title={strapiProduct.title}
+                    slug={strapiProduct.slug}
+                    isLiked={isLiked}
+                    description={strapiProduct.description}
+                    initialImage={mainImageUrl}
+                    fallbackImages={fallbackImages}
+                    colorVariants={formattedColorVariants}
+                    sizeOptions={sizeOptions}
+                    modelInfo={{
+                        modelHeight: strapiProduct.modelHeight,
+                        modelWeight: strapiProduct.modelWeight,
+                        modelSize: strapiProduct.modelSize,
+                    }}
+                    translations={{
+                        colors: t(PRODUCTPAGE.colors),
+                        desc: t(PRODUCTPAGE.desc),
+                        sizetext: t(PRODUCTPAGE.sizetext),
+                        addtocart: t(PRODUCTPAGE.addtocart),
+                        linktext: t(PRODUCTPAGE.linktext),
+                        whatsapp: t(PRODUCTPAGE.whatsapp),
+                        maniken: t(PRODUCTPAGE.maniken),
+                        height: t(PRODUCTPAGE.height),
+                        weight: t(PRODUCTPAGE.weight),
+                        mansize: t(PRODUCTPAGE.mansize),
+                    }}
+                />
+            </main>
+        </MaxWidthWrapper>
     );
 }

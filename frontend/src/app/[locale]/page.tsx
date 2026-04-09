@@ -1,120 +1,146 @@
+import { cookies } from "next/headers";
+import { unstable_cache } from "next/cache";
 import CategoryGrid from "@/src/components/cards/CategoryCard/categoryGrid";
 import LocationCard from "@/src/components/cards/LocationCard/LocationCard";
 import MaxWidthWrapper from "@/src/components/ui/MaxWidthWrapper";
 import ProductGrid from "@/src/components/productsGrid/products";
 import ProductCarousel from "@/src/components/carousel/ProductCarousel";
-
-export const dynamic = "force-dynamic";
-
-const STRAPI_URL =
-	process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
-
-function getMediaUrl(url?: string | null) {
-	if (!url) return "/image1.jpeg";
-	if (url.startsWith("http")) return url;
-	return `${STRAPI_URL}${url}`;
-}
+import {
+    getStrapiMedia,
+    strapiPublicFetch,
+} from "@/src/lib/strapi";
+import { getLikedProductIds } from "@/src/lib/user-db";
 
 function extractImageUrl(image: any) {
-	if (!image) return "/image1.jpeg";
+    if (!image) return "/image1.jpeg";
 
-	if (Array.isArray(image)) {
-		return extractImageUrl(image[0]);
-	}
+    if (Array.isArray(image)) {
+        return extractImageUrl(image[0]);
+    }
 
-	if (typeof image === "string") {
-		return getMediaUrl(image);
-	}
+    if (typeof image === "string") {
+        return getStrapiMedia(image);
+    }
 
-	if (image.url) {
-		return getMediaUrl(image.url);
-	}
+    if (image.url) {
+        return getStrapiMedia(image.url);
+    }
 
-	if (image.data) {
-		return extractImageUrl(image.data);
-	}
+    if (image.data) {
+        return extractImageUrl(image.data);
+    }
 
-	if (image.attributes?.url) {
-		return getMediaUrl(image.attributes.url);
-	}
+    if (image.attributes?.url) {
+        return getStrapiMedia(image.attributes.url);
+    }
 
-	return "/image1.jpeg";
+    return "/image1.jpeg";
 }
 
-async function getFeaturedProducts() {
-	try {
-		const res = await fetch(
-			`${STRAPI_URL}/api/products?filters[isFeatured][$eq]=true&populate=*`,
-			{ cache: "no-store" },
-		);
-
-		if (!res.ok) return { data: [] };
-		return await res.json();
-	} catch (error) {
-		console.error("Failed to fetch featured products", error);
-		return { data: [] };
-	}
+function getFeaturedProducts(locale: string) {
+    return unstable_cache(
+        async () => {
+            try {
+                return await strapiPublicFetch<{ data: any[] }>("/api/products", {
+                    query: {
+                        locale,
+                        filters: { isFeatured: { $eq: true } },
+                        fields: ["documentId", "title", "price", "slug"],
+                        populate: {
+                            image: { fields: ["url"] },
+                            category: { fields: ["name"] },
+                        },
+                        sort: ["title:asc"],
+                    },
+                    revalidate: 300,
+                    tags: [`homepage:${locale}:featured-products`],
+                });
+            } catch (error) {
+                console.error("Failed to fetch featured products", error);
+                return { data: [] };
+            }
+        },
+        [`homepage-featured-${locale}`],
+        { revalidate: 300, tags: [`homepage:${locale}:featured-products`] }
+    )();
 }
 
-async function getHomepageCategories(locale: string) {
-	try {
-		const res = await fetch(
-			`${STRAPI_URL}/api/categories?locale=${locale}&populate[image]=true`,
-			{ cache: "no-store" },
-		);
-
-		if (!res.ok) return { data: [] };
-		return await res.json();
-	} catch (error) {
-		console.error("Failed to fetch homepage categories", error);
-		return { data: [] };
-	}
+function getHomepageCategories(locale: string) {
+    return unstable_cache(
+        async () => {
+            try {
+                return await strapiPublicFetch<{ data: any[] }>("/api/categories", {
+                    query: {
+                        locale,
+                        fields: ["documentId", "name", "slug"],
+                        populate: { image: { fields: ["url"] } },
+                        sort: ["name:asc"],
+                    },
+                    revalidate: 300,
+                    tags: [`homepage:${locale}:categories`],
+                });
+            } catch (error) {
+                console.error("Failed to fetch homepage categories", error);
+                return { data: [] };
+            }
+        },
+        [`homepage-categories-${locale}`],
+        { revalidate: 300, tags: [`homepage:${locale}:categories`] }
+    )();
 }
+
+async function getJwtFromCookie() {
+    const cookieStore = await cookies();
+    return cookieStore.get("jwt")?.value ?? null;
+}
+
 
 export default async function Home({
-	params,
+    params,
 }: {
-	params: Promise<{ locale: string }>;
+    params: Promise<{ locale: string }>;
 }) {
-	const { locale } = await params;
+    const { locale } = await params;
 
-	const [productsResponse, categoriesResponse] = await Promise.all([
-		getFeaturedProducts(),
-		getHomepageCategories(locale),
-	]);
+    const [productsResponse, categoriesResponse] = await Promise.all([
+        getFeaturedProducts(locale),
+        getHomepageCategories(locale),
+    ]);
 
-	console.log(
-		"STRAPI CATEGORIES:",
-		JSON.stringify(categoriesResponse.data, null, 2),
-	);
+    const jwt = await getJwtFromCookie();
+    const likedProductIds = jwt ? await getLikedProductIds(jwt) : [];
 
-	const featuredProducts = productsResponse.data.map((item: any) => ({
-		id: item.documentId,
-		title: item.title,
-		price: item.price,
-		imageUrl: extractImageUrl(item.image),
-		category: item.category?.name || "Uncategorized",
-		slug: item.slug,
-	}));
+    const featuredProducts = productsResponse.data.map((item: any) => ({
+        id: item.documentId,
+        title: item.title,
+        price: item.price,
+        imageUrl: extractImageUrl(item.image),
+        category: item.category?.name || "Uncategorized",
+        slug: item.slug,
+    }));
 
-	const homepageCategories = categoriesResponse.data.map((item: any) => ({
-		id: item.id || item.documentId,
-		title: item.name,
-		moreLink: `/categories/${item.slug}`,
-		imageUrl: extractImageUrl(item.image),
-	}));
+    const homepageCategories = categoriesResponse.data.map((item: any) => ({
+        id: item.documentId || item.id,
+        title: item.name,
+        moreLink: `/categories/${item.slug}`,
+        imageUrl: extractImageUrl(item.image),
+    }));
 
-	return (
-		<main>
-			<MaxWidthWrapper>
-				<CategoryGrid categories={homepageCategories} />
-				<ProductCarousel
-					title="Featured Products"
-					products={featuredProducts}
-				/>
-				<ProductGrid products={featuredProducts} />
-				<LocationCard />
-			</MaxWidthWrapper>
-		</main>
-	);
+    return (
+        <main>
+            <MaxWidthWrapper>
+                <CategoryGrid categories={homepageCategories} />
+                <ProductCarousel
+                    title="Featured Products"
+                    products={featuredProducts}
+                    likedProductIds={likedProductIds}
+                />
+                <ProductGrid
+                    products={featuredProducts}
+                    likedProductIds={likedProductIds}
+                />
+                <LocationCard />
+            </MaxWidthWrapper>
+        </main>
+    );
 }

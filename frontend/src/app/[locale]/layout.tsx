@@ -1,37 +1,86 @@
 import { Footer } from "@/src/components/footer/footer";
 import Navbar from "@/src/components/navbar/Navbar";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { cookies } from "next/headers";
+import { getOrCreateCart } from "@/src/lib/cart-actions";
+import { CartItem } from "@/src/types/cart";
+import { Toaster } from "react-hot-toast";
+import { strapiPublicFetch } from "@/src/lib/strapi";
+import { AuthModalProvider } from "@/src/context/AuthModalContext";
 
 async function getNavbarCategories() {
-	try {
-		const res = await fetch(
-			"http://127.0.0.1:1337/api/categories?filters[showInNavbar][$eq]=true",
-			{ cache: "no-store" },
-		);
-		if (!res.ok) return [];
-		const json = await res.json();
-		return json.data;
-	} catch (error) {
-		console.error("Failed to fetch categories", error);
-		return [];
-	}
+    try {
+        const json = await strapiPublicFetch<{ data?: any[] }>(
+            "/api/categories",
+            {
+                query: {
+                    filters: {
+                        showInNavbar: {
+                            $eq: true,
+                        },
+                    },
+                    fields: ["name", "slug"],
+                    sort: ["name:asc"],
+                },
+                revalidate: 300,
+                tags: ["navbar-categories"],
+            }
+        );
+
+        return json.data ?? [];
+    } catch (error) {
+        console.error("Failed to fetch categories", error);
+        return [];
+    }
 }
 
 export default async function LocaleLayout({
-	children,
-	params,
+    children,
+    params,
 }: {
-	children: React.ReactNode;
-	params: Promise<{ locale: string }>;
+    children: React.ReactNode;
+    params: Promise<{ locale: string }>;
 }) {
-	await params;
+    const { locale } = await params;
+    const messages = await getMessages();
 
-	const categories = await getNavbarCategories();
+    const cookieStore = await cookies();
+    const cartSessionId = cookieStore.get("cartSessionId")?.value;
 
-	return (
-		<>
-			<Navbar strapiCategories={categories} />
-			{children}
-			<Footer />
-		</>
-	);
+    const [categories, cartData] = await Promise.all([
+        getNavbarCategories(),
+        cartSessionId ? getOrCreateCart(cartSessionId) : Promise.resolve(null),
+    ]);
+
+    const rawItems = Array.isArray(cartData?.cart_items)
+        ? cartData.cart_items
+        : Array.isArray(cartData?.cart_items?.data)
+        ? cartData.cart_items.data
+        : [];
+
+    const formattedCartItems: CartItem[] = rawItems.map((item: any) => ({
+        documentId: item.documentId,
+        productDocumentId: item.product?.documentId || "",
+        title: item.titleSnapshot,
+        slug: item.slugSnapshot,
+        imageUrl: item.imageSnapshot || "",
+        size: item.size,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+    }));
+
+    return (
+        <NextIntlClientProvider locale={locale} messages={messages}>
+            <AuthModalProvider>
+                <Navbar
+                    strapiCategories={categories}
+                    cartItems={formattedCartItems}
+                />
+                <Toaster position="top-center" />
+                {children}
+                <Footer />
+            </AuthModalProvider>
+        </NextIntlClientProvider>
+    );
 }

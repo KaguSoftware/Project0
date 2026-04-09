@@ -1,20 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as Slider from "@radix-ui/react-slider";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { PRICE_RANGE_DATA as DATA } from "./constants";
 import { PriceRangeProps } from "./types";
 
 export const Price = ({ onValueChange, initialValues }: PriceRangeProps) => {
     const t = useTranslations("Filters.Price");
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [val, setVal] = useState(
         initialValues || [DATA.DEFAULT_MIN, DATA.DEFAULT_MAX]
     );
 
-    const update = (v: number[]) => {
-        setVal(v);
-        onValueChange?.(v as [number, number]);
+    useEffect(() => {
+        if (!initialValues) return;
+        setVal(initialValues);
+    }, [initialValues]);
+
+    const commit = (v: number[]) => {
+        const nextValue = v as [number, number];
+        onValueChange?.(nextValue);
+
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("min", String(nextValue[0]));
+        params.set("max", String(nextValue[1]));
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
     };
 
     return (
@@ -27,7 +41,8 @@ export const Price = ({ onValueChange, initialValues }: PriceRangeProps) => {
                 <Slider.Root
                     className="relative flex items-center w-full h-5 touch-none select-none"
                     value={val}
-                    onValueChange={update}
+                    onValueChange={setVal}
+                    onValueCommit={commit}
                     max={DATA.MAX_LIMIT}
                     step={DATA.STEP}
                 >
