@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ revalidated: false, reason: "Unknown model" });
     }
 
-    tags.forEach((tag) => revalidateTag(tag));
+    tags.forEach((tag) => revalidateTag(tag, "default"));
 
     console.log(`[Revalidate] model=${model} tags=${tags.join(", ")}`);
 
