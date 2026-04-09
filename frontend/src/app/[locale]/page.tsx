@@ -43,7 +43,6 @@ function getFeaturedProducts(locale: string) {
             try {
                 return await strapiPublicFetch<{ data: any[] }>("/api/products", {
                     query: {
-                        locale,
                         filters: { isFeatured: { $eq: true } },
                         fields: ["documentId", "title", "price", "slug"],
                         populate: {

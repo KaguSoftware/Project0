@@ -53,7 +53,6 @@ function buildProductsQuery({
     sizeOnly?: boolean;
 }) {
     const params = new URLSearchParams();
-    params.set("locale", locale);
 
     const baseFields = sizeOnly
         ? ["sizeXS", "sizeS", "sizeM", "sizeL", "sizeXL", "sizeXXL"]
